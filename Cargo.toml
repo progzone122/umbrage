@@ -1,0 +1,24 @@
+[package]
+name = "umbrage"
+version = "0.1.0"
+edition = "2024"
+description = "🌑 ✨ Your first and last tool for flashing and exploring MTK devices"
+license = "AGPL-3.0-or-later"
+authors = ["DiabloSat <dev@diablosat.cc>"]
+repository = "https://github.com/progzone122/umbrage"
+
+[dependencies]
+qtbridge = "0.2.0"
+cxx = "1.0"
+reqwest = { version = "0.13.4", features = ["json"] }
+serde = { version = "1.0.229", features = ["derive"] }
+serde_json = "1.0.151"
+sha2 = "0.11.0"
+tokio = { version = "1.53.1", features = ["full"] }
+env_logger = "0.11.8"
+log = "0.4"
+penumbra-mtk = { git = "https://github.com/umbrage-org/umbrage-penumbra", package = "penumbra-mtk", rev = "55fb158", default-features = false, features = ["libusb", "exploits"] }
+rusb = { version = "0.9", features = ["vendored"] }
+
+[build-dependencies]
+cxx-build = "1.0"

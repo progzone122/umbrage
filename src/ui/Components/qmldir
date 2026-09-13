@@ -1,0 +1,14 @@
+module Components
+UButton 1.0 UButton.qml
+WarningBlock 1.0 WarningBlock.qml
+TopPanel 1.0 TopPanel.qml
+TemplateItem 1.0 TemplateItem.qml
+UBadge 1.0 UBadge.qml
+MainMenu 1.0 MainMenu.qml
+MenuButton 1.0 MenuButton.qml
+CollapsibleSection 1.0 CollapsibleSection.qml
+ModalDialog 1.0 ModalDialog.qml
+PartitionList 1.0 PartitionList.qml
+OperationPanel 1.0 OperationPanel.qml
+UText 1.0 UText.qml
+UPopupMenu 1.0 UPopupMenu.qml

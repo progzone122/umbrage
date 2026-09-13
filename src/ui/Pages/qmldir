@@ -1,0 +1,7 @@
+module Pages
+StepPage 1.0 StepPage.qml
+SetupPage 1.0 SetupPage.qml
+WaitConnectionPage 1.0 WaitConnectionPage.qml
+MainPage 1.0 MainPage.qml
+TemplatesPage 1.0 TemplatesPage.qml
+TemplateStepPage 1.0 TemplateStepPage.qml

@@ -1,0 +1,7 @@
+.DS_Store
+target
+zed
+.zed
+dist
+*.log
+scripts/__pycache__
