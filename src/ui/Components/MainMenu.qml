@@ -131,6 +131,9 @@ Item {
 
                         color: Styles.surfaceForeground
                         font.pixelSize: 14
+
+                        Layout.fillWidth: true
+                        elide: Text.ElideRight
                     }
                 }
 
