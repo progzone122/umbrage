@@ -91,11 +91,11 @@ sudo ./umbrage-macos-arm
 >
 > **Using Windows is strongly NOT recommended!**
 
-> Umbrage provides ready-made binaries for Windows, **but making this god*** slop system work properly with MediaTek devices is a souls-like game on hardcore mode.**
+Umbrage currently does not provide ready-made Windows binaries, **because making this f***ing slop system work properly with MediaTek devices is a souls-like game on hardcore mode.**
 
-**DO NOT USE WINDOWS! ONLY IF YOU ENJOY PAIN! DON'T CRY LATER!**
+**DO NOT USE WINDOWS! ONLY IF YOU'RE A MASOCHIST! DON'T CRY LATER!**
 
-> If you still decided to suffer - download the `umbrage-setup.exe` binary from the [latest release](https://github.com/progzone122/umbrage/releases) and run it to install Umbrage.
+If you've still decided to suffer - [compile](CONTRIBUTING.md) `umbrage-setup.exe` from source and run it to install Umbrage.
 
 `libusb` is already bundled into the binary, **but a suitable driver for the MediaTek USB interface is not installed automatically.**
 
@@ -110,7 +110,7 @@ Install **WinUSB** once via [Zadig](https://zadig.akeo.ie/):
 
 The device may remain in BROM/Preloader mode for only a limited time, after which it simply disappears from the system. So you need to select the right USB interface in Zadig and install the driver while the device is still detected.
 
-After that, Umbrage will be able to access the device via `libusb` **(Probably)**.
+After that, Umbrage will be able to access the device via `libusb` **(Probably, depending on the Indians' mood)**.
 
 _Quite simple, isn't it?_
 
