@@ -15,12 +15,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install system dependencies
+      - name: Install Qt and system dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends \
             qt6-base-dev \
+            qt6-base-private-dev \
             qt6-declarative-dev \
+            qt6-declarative-private-dev \
             libxkbcommon-dev \
             libegl1 \
             libgl1 \
@@ -35,12 +37,18 @@ jobs:
 
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@nightly
+        with:
+          toolchain: nightly
 
       - name: Cache cargo registry and target
         uses: Swatinem/rust-cache@v2
         with:
           workspaces: . -> target
-          env-vars: "CARGO CC CFLAGS CXX CMAKE RUST QMAKE QT6_DIR QT_ROOT_DIR"
 
       - name: Build
         run: cargo build --release
+        env:
+          # qtbridge locates Qt through qmake; Ubuntu names it qmake6.
+          QMAKE: /usr/bin/qmake6
+          # Ubuntu keeps rcc outside PATH.
+          RCC: /usr/lib/qt6/libexec/rcc
