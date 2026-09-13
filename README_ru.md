@@ -2,7 +2,7 @@
 
 [English](./README.md) | [Русский](./README_ru.md)
 
-<img src="./docs/banner.svg" alt="Umbrage banner">
+<img src="./docs/banner.webp" alt="Umbrage banner">
 
 Umbrage это кроссплатформенный GUI инструмент для работы с устройствами на базе SOC MediaTek, основанный на базе ядра [penumbra](https://github.com/shomykohai/penumbra) v2.0.
 

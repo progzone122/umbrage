@@ -2,7 +2,7 @@
 
 [English](./README.md) | [Русский](./README_ru.md)
 
-<img src="./docs/banner.svg" alt="Umbrage banner">
+<img src="./docs/banner.webp" alt="Umbrage banner">
 
 Umbrage is a cross-platform GUI tool for working with MediaTek SOC-based devices, built on top of the [penumbra](https://github.com/shomykohai/penumbra) core.
 
