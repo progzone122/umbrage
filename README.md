@@ -68,7 +68,7 @@ Use the same scatter files and instructions as in SP Flash Tool, straight in Umb
 Download the [latest release](https://github.com/progzone122/umbrage/releases), run Umbrage in the terminal and simply follow the on-screen instructions!
 
 ```shell
-./umbrage.AppImage
+./umbrage-linux.AppImage
 ```
 
 ### macOS
@@ -82,7 +82,7 @@ Download the [latest release](https://github.com/progzone122/umbrage/releases), 
 2. Download the [latest release](https://github.com/progzone122/umbrage/releases), run Umbrage in the terminal **with elevated privileges** and simply follow the on-screen instructions!
 
 ```shell
-sudo ./umbrage
+sudo ./umbrage-macos-arm
 ```
 
 ### Microslop Windows
@@ -90,27 +90,27 @@ sudo ./umbrage
 > ⚠️ **WARNING!**
 >
 > **Using Windows is strongly NOT recommended!**
->
+
 > Umbrage provides ready-made binaries for Windows, **but making this god*** slop system work properly with MediaTek devices is a souls-like game on hardcore mode.**
->
-> **DO NOT USE WINDOWS! ONLY IF YOU ENJOY PAIN! DON'T CRY LATER!**
->
+
+**DO NOT USE WINDOWS! ONLY IF YOU ENJOY PAIN! DON'T CRY LATER!**
+
 > If you still decided to suffer - download the `umbrage-setup.exe` binary from the [latest release](https://github.com/progzone122/umbrage/releases) and run it to install Umbrage.
->
-> `libusb` is already bundled into the binary, **but a suitable driver for the MediaTek USB interface is not installed automatically.**
->
-> Install **WinUSB** once via [Zadig](https://zadig.akeo.ie/):
->
-> 1. Connect the device in **BROM / Preloader / DA** mode.
-> 2. Open Zadig and select the device's USB interface that appears.
-> 3. Select **WinUSB** as the driver.
-> 4. Install the driver.
->
-> **AND DO IT FAST.**
->
-> The device may remain in BROM/Preloader mode for only a limited time, after which it simply disappears from the system. So you need to select the right USB interface in Zadig and install the driver while the device is still detected.
->
-> After that, Umbrage will be able to access the device via `libusb`.
+
+`libusb` is already bundled into the binary, **but a suitable driver for the MediaTek USB interface is not installed automatically.**
+
+Install **WinUSB** once via [Zadig](https://zadig.akeo.ie/):
+
+1. Connect the device in **BROM / Preloader / DA** mode.
+2. Open Zadig and select the device's USB interface that appears.
+3. Select **WinUSB** as the driver.
+4. Install the driver.
+
+**AND DO IT FAST.**
+
+The device may remain in BROM/Preloader mode for only a limited time, after which it simply disappears from the system. So you need to select the right USB interface in Zadig and install the driver while the device is still detected.
+
+After that, Umbrage will be able to access the device via `libusb` **(Probably)**.
 
 _Quite simple, isn't it?_
 
