@@ -23,16 +23,17 @@ jobs:
           cache: true
 
       - name: Install Rust toolchain
-        uses: dtolnay/rust-toolchain@stable
-        with:
-          toolchain: stable
+        uses: dtolnay/rust-toolchain@nightly
 
       - name: Cache cargo registry and target
         uses: Swatinem/rust-cache@v2
         with:
           workspaces: . -> target
+          env-vars: "CARGO CC CFLAGS CXX CMAKE RUST QMAKE QT6_DIR QT_ROOT_DIR"
 
       - name: Build
-        run: cargo build --release
-        env:
-          Qt6_DIR: ${{ env.QT_ROOT_DIR }}
+        shell: pwsh
+        run: |
+          $env:QT6_DIR = $env:QT_ROOT_DIR
+          $env:QMAKE = "$env:QT_ROOT_DIR/bin/qmake.exe"
+          cargo build --release

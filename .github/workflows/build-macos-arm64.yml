@@ -19,21 +19,22 @@ jobs:
         uses: jurplel/install-qt-action@v4
         with:
           version: "6.10.3"
-          arch: clang_arm64
+          arch: clang_64
           cache: true
 
       - name: Install Rust toolchain
-        uses: dtolnay/rust-toolchain@stable
+        uses: dtolnay/rust-toolchain@nightly
         with:
-          toolchain: stable
           targets: aarch64-apple-darwin
 
       - name: Cache cargo registry and target
         uses: Swatinem/rust-cache@v2
         with:
           workspaces: . -> target
+          env-vars: "CARGO CC CFLAGS CXX CMAKE RUST QMAKE QT6_DIR QT_ROOT_DIR"
 
       - name: Build
-        run: cargo build --release --target aarch64-apple-darwin
-        env:
-          Qt6_DIR: ${{ env.QT_ROOT_DIR }}
+        run: |
+          export QT6_DIR="$QT_ROOT_DIR"
+          export QMAKE="$QT_ROOT_DIR/bin/qmake"
+          cargo build --release --target aarch64-apple-darwin

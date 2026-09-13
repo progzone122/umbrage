@@ -23,17 +23,18 @@ jobs:
           cache: true
 
       - name: Install Rust toolchain
-        uses: dtolnay/rust-toolchain@stable
+        uses: dtolnay/rust-toolchain@nightly
         with:
-          toolchain: stable
           targets: x86_64-apple-darwin
 
       - name: Cache cargo registry and target
         uses: Swatinem/rust-cache@v2
         with:
           workspaces: . -> target
+          env-vars: "CARGO CC CFLAGS CXX CMAKE RUST QMAKE QT6_DIR QT_ROOT_DIR"
 
       - name: Build
-        run: cargo build --release --target x86_64-apple-darwin
-        env:
-          Qt6_DIR: ${{ env.QT_ROOT_DIR }}
+        run: |
+          export QT6_DIR="$QT_ROOT_DIR"
+          export QMAKE="$QT_ROOT_DIR/bin/qmake"
+          cargo build --release --target x86_64-apple-darwin
