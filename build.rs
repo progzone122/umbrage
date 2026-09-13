@@ -143,8 +143,11 @@ fn main() {
         .include(qt_headers.join("QtGui"))
         .include(qt_headers.join("QtCore"))
         // Qt 6 headers require C++17. Use .std() so MSVC gets /std:c++17;
-        // "-std=c++17" is silently ignored by cl.exe.
-        .std("c++17");
+        // "-std=c++17" is silently ignored by cl.exe. MSVC additionally
+        // needs /Zc:__cplusplus for Qt's qcompilerdetection.h.
+        .std("c++17")
+        .flag_if_supported("/Zc:__cplusplus")
+        .flag_if_supported("/permissive-");
     // Homebrew installs Qt as macOS frameworks, where headers sit under
     // <libs>/QtGui.framework/Headers instead of <headers>/QtGui. The framework
     // search path is also required to resolve the `QtGui/...` includes emitted
