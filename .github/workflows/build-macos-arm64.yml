@@ -15,18 +15,20 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # Qt >= 6.11 is required: 6.10 headers don't compile with the Xcode 26
+      # SDK (missing arm_acle.h include in qyieldcpu.h). Since 6.11 the macOS
+      # kits are universal and shipped under the clang_64 name.
       - name: Install Qt
         uses: jurplel/install-qt-action@v4
         with:
-          version: "6.10.3"
-          arch: clang_arm64
+          version: "6.11.2"
+          arch: clang_64
           cache: true
 
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: stable
-          targets: aarch64-apple-darwin
 
       - name: Cache cargo registry and target
         uses: Swatinem/rust-cache@v2
@@ -36,4 +38,5 @@ jobs:
       - name: Build
         run: cargo build --release --target aarch64-apple-darwin
         env:
-          Qt6_DIR: ${{ env.QT_ROOT_DIR }}
+          QMAKE: ${{ env.QT_ROOT_DIR }}/bin/qmake
+          RCC: ${{ env.QT_ROOT_DIR }}/libexec/rcc

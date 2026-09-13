@@ -11,20 +11,29 @@ concurrency:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install system dependencies
+      - name: Install Qt and system dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends \
             qt6-base-dev \
+            qt6-base-private-dev \
+            qt6-declarative-dev \
+            qt6-declarative-private-dev \
             libxkbcommon-dev \
             libegl1 \
             libgl1 \
+            libglib2.0-0 \
             libfontconfig1 \
-            libdbus-1-3
+            libdbus-1-3 \
+            libxcb-cursor0 \
+            libxcb-icccm4 \
+            libxcb-keysyms1 \
+            libxcb-shape0 \
+            libxcb-xkb1
 
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
@@ -38,3 +47,8 @@ jobs:
 
       - name: Build
         run: cargo build --release
+        env:
+          # qtbridge locates Qt through qmake; Ubuntu names it qmake6.
+          QMAKE: /usr/bin/qmake6
+          # Ubuntu keeps rcc outside PATH.
+          RCC: /usr/lib/qt6/libexec/rcc

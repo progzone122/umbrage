@@ -48,10 +48,11 @@ fn find_rcc() -> PathBuf {
         return PathBuf::from(p);
     }
 
-    // 2. QTDIR / QT_DIR / QT6_DIR
+    // 2. QTDIR / QT_DIR / QT6_DIR. Official Qt installs on macOS and Linux
+    //    keep rcc in libexec/, not bin/.
     for var in ["QTDIR", "QT_DIR", "QT6_DIR"] {
         if let Ok(dir) = env::var(var) {
-            for sub in ["bin/rcc", "bin/rcc.exe"] {
+            for sub in ["bin/rcc", "bin/rcc.exe", "libexec/rcc"] {
                 let candidate = PathBuf::from(&dir).join(sub);
                 if candidate.exists() {
                     return candidate;
@@ -92,9 +93,11 @@ fn find_rcc() -> PathBuf {
                     continue;
                 }
                 for sub in ["macos", "clang_64", "gcc_64"] {
-                    let candidate = kit.join(sub).join("bin").join("rcc");
-                    if candidate.exists() {
-                        return candidate;
+                    for bin in ["bin", "libexec"] {
+                        let candidate = kit.join(sub).join(bin).join("rcc");
+                        if candidate.exists() {
+                            return candidate;
+                        }
                     }
                 }
             }
@@ -139,7 +142,9 @@ fn main() {
         .include(&qt_headers)
         .include(qt_headers.join("QtGui"))
         .include(qt_headers.join("QtCore"))
-        .flag_if_supported("-std=c++17");
+        // Qt 6 headers require C++17. Use .std() so MSVC gets /std:c++17;
+        // "-std=c++17" is silently ignored by cl.exe.
+        .std("c++17");
     // Homebrew installs Qt as macOS frameworks, where headers sit under
     // <libs>/QtGui.framework/Headers instead of <headers>/QtGui. The framework
     // search path is also required to resolve the `QtGui/...` includes emitted
