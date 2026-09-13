@@ -36,9 +36,9 @@ jobs:
             libxcb-xkb1
 
       - name: Install Rust toolchain
-        uses: dtolnay/rust-toolchain@stable
+        uses: dtolnay/rust-toolchain@nightly
         with:
-          toolchain: stable
+          toolchain: nightly
 
       - name: Cache cargo registry and target
         uses: Swatinem/rust-cache@v2
