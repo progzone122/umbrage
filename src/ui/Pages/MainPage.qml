@@ -154,7 +154,12 @@ Page {
                     key: "write",
                     section: "flashing",
                     text: "Write partitions"
-                }
+                },
+                {
+                    key: "export_template",
+                    section: "other",
+                    text: "Export template"
+                },
             ]
 
             onActionRequested: function (key) {
