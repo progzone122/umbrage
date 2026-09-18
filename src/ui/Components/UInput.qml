@@ -8,7 +8,7 @@ TextField {
 
     // Text and placeholder colors, overridable per instance.
     property color textColor: Styles.textPrimary
-    property color placeholderColor: Styles.surfaceAlt
+    property color placeholderColor: Qt.lighter(Styles.surfaceForeground, 0.7)
 
     // Font scale, overridable per instance.
     property int fontSize: 16

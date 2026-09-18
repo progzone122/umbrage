@@ -90,6 +90,7 @@ Page {
                 visible: page.searching
                 autofocusOnVisible: true
                 activeFocusOnTab: true
+                placeholderColor: Styles.surfaceAlt
 
                 placeholderText: qsTr("Search…")
 
