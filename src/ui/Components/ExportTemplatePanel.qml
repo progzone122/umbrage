@@ -46,27 +46,7 @@ Item {
                     }
                 }
 
-                ColumnLayout {
-                    UText {
-                        level: "title"
-                        text: qsTr("Codename")
-                    }
-
-                    UInput {
-                        id: searchField
-
-                        Layout.fillWidth: true
-                        Layout.preferredHeight: 44
-                        Layout.alignment: Qt.AlignTop
-
-                        visible: page.searching
-                        activeFocusOnTab: true
-
-                        placeholderText: qsTr("Search…")
-
-                        onTextChanged: page.searchQuery = text
-                    }
-                }
+                UInputField {}
 
                 Item {
                     Layout.fillWidth: true
