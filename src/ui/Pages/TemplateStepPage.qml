@@ -80,7 +80,7 @@ Page {
                 }
             }
 
-            TextField {
+            UInput {
                 id: searchField
 
                 Layout.fillWidth: true
@@ -90,21 +90,7 @@ Page {
                 visible: page.searching
                 activeFocusOnTab: true
 
-                color: Styles.textPrimary
                 placeholderText: qsTr("Search…")
-                placeholderTextColor: Styles.surfaceAlt
-                font.pixelSize: 16
-                selectByMouse: true
-
-                leftPadding: 12
-                rightPadding: 12
-                topPadding: 10
-                bottomPadding: 10
-
-                background: Rectangle {
-                    radius: Styles.radiusMedium
-                    color: Styles.surface
-                }
 
                 onTextChanged: page.searchQuery = text
 
