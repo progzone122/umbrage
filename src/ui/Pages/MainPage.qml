@@ -212,7 +212,7 @@ Page {
             OperationPanel {
                 id: operationPanel
 
-                visible: page.currentOperation !== ""
+                visible: page.currentOperation == "read" || page.currentOperation == "write"
 
                 Layout.fillWidth: true
                 Layout.fillHeight: true
@@ -237,6 +237,15 @@ Page {
                     page.togglePartition(index);
                 }
                 onActionRequested: page.openOperationDialog()
+            }
+
+            ExportTemplatePanel {
+                visible: page.currentOperation == "export_template"
+
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+
+                onBackRequested: page.currentOperation = ""
             }
         }
     }
