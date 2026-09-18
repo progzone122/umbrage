@@ -46,7 +46,29 @@ Item {
                     }
                 }
 
-                UInputField {}
+                ColumnLayout {
+                    Layout.margins: Styles.spacing
+                    spacing: Styles.spacing
+
+                    UInputField {
+                        title: "Codename"
+                        placeholder: "penangf"
+                    }
+
+                    RowLayout {
+                        spacing: Styles.spacing
+
+                        UInputField {
+                            title: "Vendor"
+                            placeholder: "Motorola"
+                        }
+
+                        UInputField {
+                            title: "Model"
+                            placeholder: "G13/G23"
+                        }
+                    }
+                }
 
                 Item {
                     Layout.fillWidth: true

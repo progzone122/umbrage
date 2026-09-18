@@ -21,6 +21,7 @@ TextField {
 
     // Background color and corner radius, overridable per instance.
     property color backgroundColor: Styles.surfaceHigh
+    property color focusedBackgroundColor: Qt.darker(Styles.surfaceHigh, 1.2)
     property int backgroundRadius: Styles.radiusMedium
 
     // If true, focus when the field becomes visible.
@@ -40,6 +41,12 @@ TextField {
     font.pixelSize: root.fontSize
     selectByMouse: true
 
+    // Override the control's dark palette roles so the Fusion style never
+    // paints a dark background on top of our custom one when focused.
+    palette.base: root.backgroundColor
+    palette.highlight: root.focusedBackgroundColor
+    palette.highlightedText: root.textColor
+
     leftPadding: root.uiLeftPadding
     rightPadding: root.uiRightPadding
     topPadding: root.uiTopPadding
@@ -47,6 +54,6 @@ TextField {
 
     background: Rectangle {
         radius: root.backgroundRadius
-        color: root.backgroundColor
+        color: root.activeFocus ? root.focusedBackgroundColor : root.backgroundColor
     }
 }
