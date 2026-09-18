@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Controls
+import QtQuick.Layouts
 import UmbrageStyles 1.0
 
 TextField {
@@ -13,16 +14,16 @@ TextField {
     property int fontSize: 16
 
     // Padding, overridable per instance.
-    property real leftInset: 12
-    property real rightInset: 12
-    property real topInset: 10
-    property real bottomInset: 10
+    property real uiLeftPadding: 12
+    property real uiRightPadding: 12
+    property real uiTopPadding: 10
+    property real uiBottomPadding: 10
 
     // Background color and corner radius, overridable per instance.
     property color backgroundColor: Styles.surface
     property int backgroundRadius: Styles.radiusMedium
 
-    implicitHeight: root.topInset + root.bottomInset + font.pixelSize
+    implicitHeight: root.uiTopPadding + root.uiBottomPadding + font.pixelSize
 
     Layout.fillWidth: true
 
@@ -31,10 +32,10 @@ TextField {
     font.pixelSize: root.fontSize
     selectByMouse: true
 
-    leftPadding: root.leftInset
-    rightPadding: root.rightInset
-    topPadding: root.topInset
-    bottomPadding: root.bottomInset
+    leftPadding: root.uiLeftPadding
+    rightPadding: root.uiRightPadding
+    topPadding: root.uiTopPadding
+    bottomPadding: root.uiBottomPadding
 
     background: Rectangle {
         radius: root.backgroundRadius
