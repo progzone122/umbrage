@@ -83,7 +83,6 @@ Page {
             UInput {
                 id: searchField
 
-                Layout.fillWidth: true
                 Layout.preferredHeight: 44
                 Layout.alignment: Qt.AlignTop
 

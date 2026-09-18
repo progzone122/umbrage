@@ -2,22 +2,42 @@ import QtQuick
 import QtQuick.Controls
 import UmbrageStyles 1.0
 
-// Reusable styled text input, matching the design tokens in Styles.qml.
 TextField {
     id: root
 
-    color: Styles.textPrimary
-    placeholderTextColor: Styles.surfaceAlt
-    font.pixelSize: 16
+    // Text and placeholder colors, overridable per instance.
+    property color textColor: Styles.textPrimary
+    property color placeholderColor: Styles.surfaceAlt
+
+    // Font scale, overridable per instance.
+    property int fontSize: 16
+
+    // Padding, overridable per instance.
+    property real leftInset: 12
+    property real rightInset: 12
+    property real topInset: 10
+    property real bottomInset: 10
+
+    // Background color and corner radius, overridable per instance.
+    property color backgroundColor: Styles.surface
+    property int backgroundRadius: Styles.radiusMedium
+
+    implicitHeight: root.topInset + root.bottomInset + font.pixelSize
+
+    Layout.fillWidth: true
+
+    color: root.textColor
+    placeholderTextColor: root.placeholderColor
+    font.pixelSize: root.fontSize
     selectByMouse: true
 
-    leftPadding: 12
-    rightPadding: 12
-    topPadding: 10
-    bottomPadding: 10
+    leftPadding: root.leftInset
+    rightPadding: root.rightInset
+    topPadding: root.topInset
+    bottomPadding: root.bottomInset
 
     background: Rectangle {
-        radius: Styles.radiusMedium
-        color: Styles.surface
+        radius: root.backgroundRadius
+        color: root.backgroundColor
     }
 }
