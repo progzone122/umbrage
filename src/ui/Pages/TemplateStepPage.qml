@@ -86,17 +86,14 @@ Page {
                 Layout.preferredHeight: 44
                 Layout.alignment: Qt.AlignTop
 
+                backgroundColor: Styles.surface
                 visible: page.searching
+                autofocusOnVisible: true
                 activeFocusOnTab: true
 
                 placeholderText: qsTr("Search…")
 
                 onTextChanged: page.searchQuery = text
-
-                onVisibleChanged: {
-                    if (visible)
-                        forceActiveFocus();
-                }
             }
 
             Button {

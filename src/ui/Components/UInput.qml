@@ -20,12 +20,20 @@ TextField {
     property real uiBottomPadding: 10
 
     // Background color and corner radius, overridable per instance.
-    property color backgroundColor: Styles.surface
+    property color backgroundColor: Styles.surfaceHigh
     property int backgroundRadius: Styles.radiusMedium
+
+    // If true, focus when the field becomes visible.
+    property bool autofocusOnVisible: false
 
     implicitHeight: root.uiTopPadding + root.uiBottomPadding + font.pixelSize
 
     Layout.fillWidth: true
+
+    onVisibleChanged: {
+        if (visible && autofocusOnVisible)
+            forceActiveFocus();
+    }
 
     color: root.textColor
     placeholderTextColor: root.placeholderColor

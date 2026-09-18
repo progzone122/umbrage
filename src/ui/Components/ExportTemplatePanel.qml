@@ -65,11 +65,6 @@ Item {
                         placeholderText: qsTr("Search…")
 
                         onTextChanged: page.searchQuery = text
-
-                        onVisibleChanged: {
-                            if (visible)
-                                forceActiveFocus();
-                        }
                     }
                 }
 
