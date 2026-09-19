@@ -71,14 +71,14 @@ Item {
                     Layout.fillWidth: true
                     title: "DA"
                     icon: "qrc:/assets/da_icon.svg"
-                    value: root.version.da ? root.version.da : ""
+                    value: root.version.da
                     onValueChanged: root.version.da = value
                 }
                 UChooserField {
                     Layout.fillWidth: true
                     title: "Auth"
                     icon: "qrc:/assets/auth_icon.svg"
-                    value: root.version.auth ? root.version.auth : ""
+                    value: root.version.auth
                     onValueChanged: root.version.auth = value
                 }
 
@@ -86,7 +86,7 @@ Item {
                     Layout.fillWidth: true
                     title: "Preloader"
                     icon: "qrc:/assets/preloader_icon.svg"
-                    value: root.version.preloader ? root.version.preloader : ""
+                    value: root.version.preloader
                     onValueChanged: root.version.preloader = value
                 }
             }

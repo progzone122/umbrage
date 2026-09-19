@@ -1,6 +1,8 @@
 use std::path::PathBuf;
 
-use umbrage::templates::export::{ExportFiles, ExportPayload, ExportVersion, build_yaml};
+use umbrage::templates::export::{
+    ExportFile, ExportFiles, ExportPayload, ExportVersion, build_yaml,
+};
 
 /// Writes `content` to a unique temp file and returns its path. The basename
 /// is what ends up in the YAML, so the directory can be anything.
@@ -29,9 +31,9 @@ fn exports_yaml_with_computed_checksums() {
                 description:
                     "Works with an unlocked bootloader. Vulnerable to the Carbonara exploit.".into(),
                 files: ExportFiles {
-                    da: da.to_string_lossy().into_owned(),
-                    auth: auth.to_string_lossy().into_owned(),
-                    preloader: String::new(),
+                    da: ExportFile::Path(da.to_string_lossy().into_owned()),
+                    auth: ExportFile::Path(auth.to_string_lossy().into_owned()),
+                    preloader: ExportFile::Path(String::new()),
                 },
             },
             ExportVersion {
@@ -41,9 +43,9 @@ fn exports_yaml_with_computed_checksums() {
                     "Works on a locked bootloader via a flash tool. The flashing is highly limited."
                         .into(),
                 files: ExportFiles {
-                    da: String::new(),
-                    auth: String::new(),
-                    preloader: preloader.to_string_lossy().into_owned(),
+                    da: ExportFile::Path(String::new()),
+                    auth: ExportFile::Path(String::new()),
+                    preloader: ExportFile::Path(preloader.to_string_lossy().into_owned()),
                 },
             },
         ],
@@ -80,6 +82,52 @@ versions:
       # da:
       # auth:
       preloader: 4a492fadef86732b7736311ceaa067a0ca159ea3ba520719a603fad8ec623b4c
+"#
+    );
+}
+
+#[test]
+fn exports_named_files_without_reading_disk() {
+    let payload = ExportPayload {
+        vendor: "Motorola".into(),
+        model: "G13/G23".into(),
+        codename: "penangf".into(),
+        versions: vec![ExportVersion {
+            default: true,
+            name: "Carbonara Exploit or Unlocked BL".into(),
+            description: "Works with an unlocked bootloader.".into(),
+            files: ExportFiles {
+                da: ExportFile::Named {
+                    name: "MT6769_USER.bin".into(),
+                    sha256: "5fce44cc54451997159d3fd78564d1ddafdfda02341fedcadeee8780004258a9"
+                        .into(),
+                },
+                auth: ExportFile::Path(String::new()),
+                preloader: ExportFile::Path(String::new()),
+            },
+        }],
+    };
+
+    let yaml = build_yaml(&payload).unwrap();
+
+    assert_eq!(
+        yaml,
+        r#"vendor: Motorola
+model: G13/G23
+codename: penangf
+versions:
+  - id: 0
+    default: true
+    name: "Carbonara Exploit or Unlocked BL"
+    description: "Works with an unlocked bootloader."
+    files:
+      da: MT6769_USER.bin
+      # auth:
+      # preloader:
+    checksums:
+      da: 5fce44cc54451997159d3fd78564d1ddafdfda02341fedcadeee8780004258a9
+      # auth:
+      # preloader:
 "#
     );
 }

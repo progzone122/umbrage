@@ -10,7 +10,8 @@ import Components 1.0
 Item {
     id: root
 
-    // { name, description, da, auth, preloader, default }
+    // { name, description, da, auth, preloader, default }.
+    // da/auth/preloader are file slots: { path, name, sha256 }.
     property var versions: []
 
     property string codename: ""
@@ -55,9 +56,9 @@ Item {
                 description: v.description ? v.description : "",
                 default: v.default === true,
                 files: {
-                    da: v.da ? v.da : "",
-                    auth: v.auth ? v.auth : "",
-                    preloader: v.preloader ? v.preloader : ""
+                    da: root.filePayload(v.da),
+                    auth: root.filePayload(v.auth),
+                    preloader: root.filePayload(v.preloader)
                 }
             });
         }
@@ -67,6 +68,21 @@ Item {
             codename: root.codename ? root.codename : "",
             versions: list
         });
+    }
+
+    // A local path is sent as-is; a repo entry is sent as { name, sha256 } so
+    // Rust reuses the checksum without reading the file.
+    function filePayload(entry) {
+        if (!entry)
+            return "";
+        if (entry.path)
+            return entry.path;
+        if (entry.sha256)
+            return {
+                name: entry.name,
+                sha256: entry.sha256
+            };
+        return "";
     }
 
     Rectangle {

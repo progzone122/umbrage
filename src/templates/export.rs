@@ -24,43 +24,69 @@ pub struct ExportVersion {
     pub files: ExportFiles,
 }
 
-/// File paths picked for one version. Empty means the slot is unused.
+/// File picks for one version. Empty means the slot is unused.
 #[derive(Debug, Default, Deserialize)]
 pub struct ExportFiles {
     #[serde(default)]
-    pub da: String,
+    pub da: ExportFile,
     #[serde(default)]
-    pub auth: String,
+    pub auth: ExportFile,
     #[serde(default)]
-    pub preloader: String,
+    pub preloader: ExportFile,
 }
 
-/// A file with its checksum computed from disk.
+/// One file for a version. A path has its checksum computed from disk; a named
+/// entry carries a checksum straight from the repository.
+#[derive(Debug, Deserialize)]
+#[serde(untagged)]
+pub enum ExportFile {
+    Path(String),
+    Named { name: String, sha256: String },
+}
+
+impl Default for ExportFile {
+    fn default() -> Self {
+        ExportFile::Path(String::new())
+    }
+}
+
+/// A file name plus its SHA-256, read from disk or carried from the repo.
 struct ResolvedFile {
     name: String,
     sha256: String,
 }
 
-/// Reads the file at `value` (a `file://` URL or plain path) and returns its
-/// basename plus SHA-256. The YAML stores only the basename, never the path.
-fn resolve_file(value: &str) -> Result<ResolvedFile, String> {
-    let path = value.trim_start_matches("file://");
-    let name = Path::new(path)
-        .file_name()
-        .map(|n| n.to_string_lossy().into_owned())
-        .unwrap_or_default();
+/// Resolves a file slot into a name + SHA-256. Empty slots resolve to `None`.
+fn resolve_file(file: &ExportFile) -> Result<Option<ResolvedFile>, String> {
+    match file {
+        ExportFile::Named { name, sha256 } if name.is_empty() && sha256.is_empty() => Ok(None),
+        ExportFile::Named { name, sha256 } => Ok(Some(ResolvedFile {
+            name: name.clone(),
+            sha256: sha256.clone(),
+        })),
+        ExportFile::Path(value) => {
+            let path = value.trim_start_matches("file://");
+            if path.is_empty() {
+                return Ok(None);
+            }
 
-    let bytes = std::fs::read(path).map_err(|e| format!("Failed to read {path}: {e}"))?;
-    let sha256: String = Sha256::digest(&bytes)
-        .iter()
-        .map(|b| format!("{b:02x}"))
-        .collect();
+            let name = Path::new(path)
+                .file_name()
+                .map(|n| n.to_string_lossy().into_owned())
+                .unwrap_or_default();
 
-    Ok(ResolvedFile { name, sha256 })
+            let bytes = std::fs::read(path).map_err(|e| format!("Failed to read {path}: {e}"))?;
+            let sha256: String = Sha256::digest(&bytes)
+                .iter()
+                .map(|b| format!("{b:02x}"))
+                .collect();
+
+            Ok(Some(ResolvedFile { name, sha256 }))
+        }
+    }
 }
 
-/// Builds the meta.yml document for `payload`, computing checksums from the
-/// picked files.
+/// Builds the meta.yml document for `payload`.
 pub fn build_yaml(payload: &ExportPayload) -> Result<String, String> {
     let mut out = String::new();
 
@@ -70,9 +96,9 @@ pub fn build_yaml(payload: &ExportPayload) -> Result<String, String> {
     out.push_str("versions:\n");
 
     for (index, version) in payload.versions.iter().enumerate() {
-        let da = resolve_if_set(&version.files.da)?;
-        let auth = resolve_if_set(&version.files.auth)?;
-        let preloader = resolve_if_set(&version.files.preloader)?;
+        let da = resolve_file(&version.files.da)?;
+        let auth = resolve_file(&version.files.auth)?;
+        let preloader = resolve_file(&version.files.preloader)?;
 
         out.push_str(&format!("  - id: {index}\n"));
         if version.default {
@@ -96,14 +122,6 @@ pub fn build_yaml(payload: &ExportPayload) -> Result<String, String> {
     }
 
     Ok(out)
-}
-
-fn resolve_if_set(value: &str) -> Result<Option<ResolvedFile>, String> {
-    if value.is_empty() {
-        Ok(None)
-    } else {
-        resolve_file(value).map(Some)
-    }
 }
 
 fn write_file_entry(out: &mut String, key: &str, file: Option<&ResolvedFile>) {

@@ -12,8 +12,13 @@ ColumnLayout {
     property string title: "Undefined title"
     /// Hint shown when the field is empty.
     property string placeholder: "Undefined placeholder"
-    /// Chooser path, bound both ways.
-    property string value: ""
+    /// File slot: { path, name, sha256 }. `path` is a local file; `name` and
+    /// `sha256` come from the repository when there is no local file.
+    property var value: ({
+            path: "",
+            name: "",
+            sha256: ""
+        })
     /// Chooser button icon
     property string icon: "qrc:/assets/da_icon.svg"
 
@@ -34,7 +39,13 @@ ColumnLayout {
 
         iconDisplay: Button.TextBesideIcon
         iconPath: root.icon
-        text: root.value ? Utils.baseName(root.value) : "Choose file"
+        text: {
+            if (root.value && root.value.path)
+                return Utils.baseName(root.value.path);
+            if (root.value && root.value.name)
+                return root.value.name;
+            return "Choose file";
+        }
 
         contentAlignment: Qt.AlignLeft
 
@@ -57,7 +68,11 @@ ColumnLayout {
         fileMode: FileDialog.OpenFile
 
         onAccepted: {
-            root.value = fileDialog.file.toString();
+            root.value = {
+                path: fileDialog.file.toString(),
+                name: "",
+                sha256: ""
+            };
         }
     }
 }

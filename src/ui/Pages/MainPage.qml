@@ -119,9 +119,21 @@ Page {
         var entry = {
             name: "",
             description: "",
-            da: "",
-            auth: "",
-            preloader: "",
+            da: {
+                path: "",
+                name: "",
+                sha256: ""
+            },
+            auth: {
+                path: "",
+                name: "",
+                sha256: ""
+            },
+            preloader: {
+                path: "",
+                name: "",
+                sha256: ""
+            },
             default: false
         };
         page.versions = page.versions.concat([entry]);
@@ -140,7 +152,9 @@ Page {
     // Fills the export fields from the template picked in the templates flow.
     // Looks the device up in AppState.repo and copies its versions into the
     // { name, description, da, auth, preloader, default } entries the panel
-    // renders.
+    // renders. Files carry the repo name + checksum so the export can reuse
+    // them without reading local files, which only exist for the version the
+    // user downloaded.
     function populateFromSelectedTemplate() {
         if (AppState.selected_codename === "")
             return;
@@ -159,12 +173,27 @@ Page {
             return {
                 name: version.name,
                 description: version.description,
-                da: files.da ? files.da.name : "",
-                auth: files.auth ? files.auth.name : "",
-                preloader: files.preloader ? files.preloader.name : "",
+                da: page.templateFile(files.da),
+                auth: page.templateFile(files.auth),
+                preloader: page.templateFile(files.preloader),
                 default: !!version.default
             };
         });
+    }
+
+    // Turns a repo file entry into a slot the chooser/export understand.
+    function templateFile(repoFile) {
+        if (!repoFile)
+            return {
+                path: "",
+                name: "",
+                sha256: ""
+            };
+        return {
+            path: "",
+            name: repoFile.name || "",
+            sha256: repoFile.sha256 || ""
+        };
     }
 
     // Applies a parsed scatter file's entries to the partition table. Entries
