@@ -40,12 +40,12 @@ Text {
     case "title":
         return 700;
     case "body":
-        return 500;
+        return 600;
     case "label":
-        return 400;
+        return 500;
     case "small":
-        return 400;
+        return 500;
     default:
-        return 400;
+        return 500;
     }
 }

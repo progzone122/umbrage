@@ -154,7 +154,12 @@ Page {
                     key: "write",
                     section: "flashing",
                     text: "Write partitions"
-                }
+                },
+                {
+                    key: "export_template",
+                    section: "other",
+                    text: "Export template"
+                },
             ]
 
             onActionRequested: function (key) {
@@ -212,7 +217,7 @@ Page {
             OperationPanel {
                 id: operationPanel
 
-                visible: page.currentOperation !== ""
+                visible: page.currentOperation == "read" || page.currentOperation == "write"
 
                 Layout.fillWidth: true
                 Layout.fillHeight: true
@@ -237,6 +242,26 @@ Page {
                     page.togglePartition(index);
                 }
                 onActionRequested: page.openOperationDialog()
+            }
+
+            ExportTemplatePanel {
+                visible: page.currentOperation == "export_template"
+
+                versions: [
+                    {
+                        name: "Carbonara Exploit",
+                        description: "version description",
+                        da: "",
+                        auth: "",
+                        preloader: "",
+                        default: true
+                    }
+                ]
+
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+
+                onBackRequested: page.currentOperation = ""
             }
         }
     }

@@ -13,6 +13,7 @@ Item {
 
     property bool bootloaderExpanded: false
     property bool flashingExpanded: false
+    property bool otherExpanded: false
 
     // `key` matches an entry in the caller-provided `actions`.
     signal actionRequested(string key)
@@ -81,6 +82,23 @@ Item {
 
                         Repeater {
                             model: root.actionsForSection("flashing")
+
+                            delegate: MenuButton {
+                                text: modelData.text
+                                onClicked: root.actionRequested(modelData.key)
+                            }
+                        }
+                    }
+
+                    CollapsibleSection {
+                        Layout.fillWidth: true
+
+                        title: "Other"
+                        expanded: root.otherExpanded
+                        onToggleRequested: root.otherExpanded = !root.otherExpanded
+
+                        Repeater {
+                            model: root.actionsForSection("other")
 
                             delegate: MenuButton {
                                 text: modelData.text
