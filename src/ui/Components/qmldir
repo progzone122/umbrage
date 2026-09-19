@@ -14,5 +14,6 @@ UText 1.0 UText.qml
 UPopupMenu 1.0 UPopupMenu.qml
 UInput 1.0 UInput.qml
 UInputField 1.0 UInputField.qml
-TemplateList 1.0 TemplateList.qml
+TemplateVersionList 1.0 TemplateVersionList.qml
 ExportTemplatePanel 1.0 ExportTemplatePanel.qml
+ExportTemplateVersionPanel 1.0 ExportTemplateVersionPanel.qml

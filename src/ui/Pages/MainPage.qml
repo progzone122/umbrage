@@ -27,6 +27,26 @@ Page {
     property int pendingFileIndex: -1
     property string outputDirectory: ""
 
+    // { name, description, da, auth, preloader, default }
+    property var versions: [
+        {
+            name: "Carbonara Exploit",
+            description: "version description",
+            da: "",
+            auth: "",
+            preloader: "",
+            default: true
+        }
+    ]
+    property var selectedVersion: ({})
+
+    // Leaving the export flow collapses the drill-down stack back to the
+    // template list so it starts fresh next time.
+    onCurrentOperationChanged: {
+        if (page.currentOperation !== "export_template" && exportStack.depth > 1)
+            exportStack.pop(null);
+    }
+
     // Fetch the real partition table when the page becomes visible with a
     // device connected.
     onVisibleChanged: {
@@ -244,24 +264,39 @@ Page {
                 onActionRequested: page.openOperationDialog()
             }
 
-            ExportTemplatePanel {
-                visible: page.currentOperation == "export_template"
-
-                versions: [
-                    {
-                        name: "Carbonara Exploit",
-                        description: "version description",
-                        da: "",
-                        auth: "",
-                        preloader: "",
-                        default: true
-                    }
-                ]
+            StackView {
+                id: exportStack
 
                 Layout.fillWidth: true
                 Layout.fillHeight: true
+                visible: page.currentOperation == "export_template"
+                clip: true
 
-                onBackRequested: page.currentOperation = ""
+                initialItem: exportTemplateComponent
+
+                Component {
+                    id: exportTemplateComponent
+
+                    ExportTemplatePanel {
+                        versions: page.versions
+
+                        onBackRequested: page.currentOperation = ""
+                        onVersionSelected: function (index) {
+                            page.selectedVersion = page.versions[index];
+                            exportStack.push(exportVersionComponent);
+                        }
+                    }
+                }
+
+                Component {
+                    id: exportVersionComponent
+
+                    ExportTemplateVersionPanel {
+                        version: page.selectedVersion
+
+                        onBackRequested: exportStack.pop()
+                    }
+                }
             }
         }
     }

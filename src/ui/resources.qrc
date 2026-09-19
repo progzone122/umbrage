@@ -45,9 +45,10 @@
         <file alias="Components/CollapsibleSection.qml">Components/CollapsibleSection.qml</file>
         <file alias="Components/ModalDialog.qml">Components/ModalDialog.qml</file>
         <file alias="Components/PartitionList.qml">Components/PartitionList.qml</file>
-        <file alias="Components/TemplateList.qml">Components/TemplateList.qml</file>
+        <file alias="Components/TemplateVersionList.qml">Components/TemplateVersionList.qml</file>
         <file alias="Components/OperationPanel.qml">Components/OperationPanel.qml</file>
         <file alias="Components/ExportTemplatePanel.qml">Components/ExportTemplatePanel.qml</file>
+        <file alias="Components/ExportTemplateVersionPanel.qml">Components/ExportTemplateVersionPanel.qml</file>
         <file alias="Components/WarningBlock.qml">Components/WarningBlock.qml</file>
 
 

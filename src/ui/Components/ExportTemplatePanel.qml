@@ -17,6 +17,10 @@ Item {
     property string model: "model"
 
     signal backRequested
+    signal versionSelected(int index)
+
+    Layout.fillWidth: true
+    Layout.fillHeight: true
 
     Rectangle {
         anchors.fill: parent
@@ -86,10 +90,14 @@ Item {
                     text: "Template versions"
                 }
 
-                TemplateList {
+                TemplateVersionList {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     versions: root.versions
+
+                    onVersionToggled: function (index) {
+                        root.versionSelected(index);
+                    }
                 }
             }
         }
