@@ -63,11 +63,26 @@ Item {
             }
 
             RowLayout {
+                spacing: Styles.spacing
+
                 UChooserField {
                     Layout.fillWidth: true
                     title: "DA"
                     icon: "qrc:/assets/da_icon.svg"
-                    value: root.version.da ? root.version.da : "dsfdsfds"
+                    value: root.version.da ? root.version.da : ""
+                }
+                UChooserField {
+                    Layout.fillWidth: true
+                    title: "Auth"
+                    icon: "qrc:/assets/auth_icon.svg"
+                    value: root.version.auth ? root.version.auth : ""
+                }
+
+                UChooserField {
+                    Layout.fillWidth: true
+                    title: "Preloader"
+                    icon: "qrc:/assets/preloader_icon.svg"
+                    value: root.version.preloader ? root.version.preloader : ""
                 }
             }
 

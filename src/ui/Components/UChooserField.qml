@@ -3,6 +3,7 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import Qt.labs.platform
 import UmbrageStyles 1.0
+import UmbrageUtils 1.0
 
 ColumnLayout {
     id: root
@@ -12,7 +13,7 @@ ColumnLayout {
     /// Hint shown when the field is empty.
     property string placeholder: "Undefined placeholder"
     /// Chooser path, bound both ways.
-    property alias value: input.text
+    property string value: ""
     /// Chooser button icon
     property string icon: "qrc:/assets/da_icon.svg"
 
@@ -33,7 +34,7 @@ ColumnLayout {
 
         iconDisplay: Button.TextBesideIcon
         iconPath: root.icon
-        text: root.value
+        text: Utils.baseName(root.value)
 
         contentAlignment: Qt.AlignLeft
 
@@ -55,6 +56,8 @@ ColumnLayout {
         title: qsTr("Choose file")
         fileMode: FileDialog.OpenFile
 
-        onAccepted: {}
+        onAccepted: {
+            root.value = fileDialog.file.toString();
+        }
     }
 }
