@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import Qt.labs.platform
 import umbrage
 import UmbrageStyles 1.0
 import UmbrageUtils 1.0
@@ -23,6 +24,47 @@ Item {
 
     Layout.fillWidth: true
     Layout.fillHeight: true
+
+    // The save dialog suggests this file name, built from the codename.
+    function exportFileName() {
+        var name = root.codename.trim();
+        if (name === "")
+            name = "template";
+        return name + ".meta.yml";
+    }
+
+    function openExportDialog() {
+        var dir = StandardPaths.writableLocation(StandardPaths.DocumentsLocation);
+        if (dir === "")
+            dir = StandardPaths.writableLocation(StandardPaths.HomeLocation);
+        exportDialog.folder = dir;
+        exportDialog.currentFile = dir + "/" + root.exportFileName();
+        exportDialog.open();
+    }
+
+    // Shapes the panel data into the JSON payload Rust expects for export.
+    function buildExportPayload() {
+        var list = [];
+        for (var i = 0; i < root.versions.length; i++) {
+            var v = root.versions[i];
+            list.push({
+                name: v.name ? v.name : "",
+                description: v.description ? v.description : "",
+                default: v.default === true,
+                files: {
+                    da: v.da ? v.da : "",
+                    auth: v.auth ? v.auth : "",
+                    preloader: v.preloader ? v.preloader : ""
+                }
+            });
+        }
+        return JSON.stringify({
+            vendor: root.vendor ? root.vendor : "",
+            model: root.model ? root.model : "",
+            codename: root.codename ? root.codename : "",
+            versions: list
+        });
+    }
 
     Rectangle {
         anchors.fill: parent
@@ -65,6 +107,7 @@ Item {
                     title: "Codename"
                     placeholder: "penangf"
                     value: root.codename
+                    onValueChanged: root.codename = value
                 }
 
                 RowLayout {
@@ -76,6 +119,7 @@ Item {
                         title: "Vendor"
                         placeholder: "Motorola"
                         value: root.vendor
+                        onValueChanged: root.vendor = value
                     }
 
                     UInputField {
@@ -83,6 +127,7 @@ Item {
                         title: "Model"
                         placeholder: "G13/G23"
                         value: root.model
+                        onValueChanged: root.model = value
                     }
                 }
 
@@ -125,7 +170,56 @@ Item {
                         }
                     }
                 }
+
+                UButton {
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: 48
+
+                    text: qsTr("Export template")
+                    backgroundColor: Styles.surfaceHigh
+
+                    onClicked: root.openExportDialog()
+                }
             }
         }
+    }
+
+    FileDialog {
+        id: exportDialog
+
+        title: qsTr("Export template")
+        fileMode: FileDialog.SaveFile
+        nameFilters: [qsTr("YAML template (*.yml)")]
+        defaultSuffix: "yml"
+
+        onAccepted: {
+            AppState.exportTemplate(root.buildExportPayload(), exportDialog.file.toString());
+        }
+    }
+
+    Connections {
+        target: AppState
+        function onExportFinished(success, message) {
+            if (success) {
+                exportResultDialog.title = qsTr("Template exported");
+                exportResultDialog.description = message;
+            } else {
+                exportResultDialog.title = qsTr("Export failed");
+                exportResultDialog.description = message;
+            }
+            exportResultDialog.open();
+        }
+    }
+
+    ModalDialog {
+        id: exportResultDialog
+
+        showLog: false
+        showSpinner: false
+        showCancel: false
+        showConfirm: true
+        confirmText: qsTr("Close")
+
+        onConfirmed: exportResultDialog.close()
     }
 }

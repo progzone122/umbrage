@@ -4,6 +4,7 @@ use std::{path::Path, path::PathBuf};
 
 use sha2::{Digest, Sha256};
 
+pub mod export;
 pub mod model;
 
 const ENDPOINT: &str = "https://progzone122.github.io/umbrage-repo";

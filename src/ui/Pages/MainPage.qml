@@ -28,16 +28,7 @@ Page {
     property string outputDirectory: ""
 
     // { name, description, da, auth, preloader, default }
-    property var versions: [
-        {
-            name: "Carbonara Exploit",
-            description: "version description",
-            da: "",
-            auth: "",
-            preloader: "",
-            default: true
-        }
-    ]
+    property var versions: []
     property var selectedVersion: ({})
 
     // Codename, vendor, and model for the exported template. Filled from the

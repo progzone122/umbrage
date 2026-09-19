@@ -180,6 +180,9 @@ impl AppState {
     pub(crate) fn template_progress(&mut self, message: String, percent: i32);
 
     #[qsignal]
+    pub(crate) fn export_finished(&mut self, success: bool, message: String);
+
+    #[qsignal]
     pub(crate) fn bootloader_lock_progress(&mut self, message: String);
 
     #[qsignal]
@@ -251,6 +254,16 @@ impl AppState {
     #[qslot]
     fn template_download_failed(&mut self, files_json: String) {
         callbacks::templates::template_download_failed(self, files_json);
+    }
+
+    #[qslot]
+    fn export_template(&mut self, payload_json: String, dest: String) {
+        callbacks::export::export_template(self, payload_json, dest);
+    }
+
+    #[qslot]
+    fn export_result(&mut self, success: bool, message: String) {
+        callbacks::export::export_result(self, success, message);
     }
 
     #[qslot]
