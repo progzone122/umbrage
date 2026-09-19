@@ -125,16 +125,14 @@ pub fn build_yaml(payload: &ExportPayload) -> Result<String, String> {
 }
 
 fn write_file_entry(out: &mut String, key: &str, file: Option<&ResolvedFile>) {
-    match file {
-        Some(file) => out.push_str(&format!("      {key}: {}\n", yaml_scalar(&file.name))),
-        None => out.push_str(&format!("      # {key}:\n")),
+    if let Some(file) = file {
+        out.push_str(&format!("      {key}: {}\n", yaml_scalar(&file.name)));
     }
 }
 
 fn write_checksum_entry(out: &mut String, key: &str, file: Option<&ResolvedFile>) {
-    match file {
-        Some(file) => out.push_str(&format!("      {key}: {}\n", file.sha256)),
-        None => out.push_str(&format!("      # {key}:\n")),
+    if let Some(file) = file {
+        out.push_str(&format!("      {key}: {}\n", file.sha256));
     }
 }
 
