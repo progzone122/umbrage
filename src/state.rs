@@ -30,6 +30,7 @@ pub struct AppState {
     pub(crate) chip_name: String,
     pub(crate) chip_platform: String,
     pub(crate) device_name: String,
+    pub(crate) selected_codename: String,
     pub(crate) connection_error: String,
     pub(crate) device_tx: Arc<Mutex<Option<Sender<DeviceCommand>>>>,
     pub(crate) need_setup: bool,
@@ -64,6 +65,11 @@ impl AppState {
         "device_name",
         Member = device_name,
         Notify = device_name_changed
+    );
+    qproperty!(
+        "selected_codename",
+        Member = selected_codename,
+        Notify = selected_codename_changed
     );
     qproperty!(
         "connection_error",
@@ -130,6 +136,9 @@ impl AppState {
 
     #[qsignal]
     pub(crate) fn device_name_changed(&mut self);
+
+    #[qsignal]
+    pub(crate) fn selected_codename_changed(&mut self);
 
     #[qsignal]
     pub(crate) fn connection_error_changed(&mut self);
@@ -335,6 +344,7 @@ impl Default for AppState {
             chip_name: String::new(),
             chip_platform: String::new(),
             device_name: String::new(),
+            selected_codename: String::new(),
             connection_error: String::new(),
             device_tx: Arc::new(Mutex::new(None)),
             need_setup: false,

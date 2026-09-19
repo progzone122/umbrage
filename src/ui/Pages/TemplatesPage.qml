@@ -58,6 +58,7 @@ Page {
         page.selectedDevice = "";
         page.startTime = Date.now();
         AppState.device_name = "";
+        AppState.selected_codename = "";
         page.syncDialogs();
         AppState.requestGetTemplates();
     }
@@ -235,6 +236,7 @@ Page {
         } else if (step === 1) {
             page.selectedDevice = item.code;
             AppState.device_name = item.title;
+            AppState.selected_codename = item.code;
             stepStack.pushStep(2);
         } else {
             page.applyFiles(item.files);

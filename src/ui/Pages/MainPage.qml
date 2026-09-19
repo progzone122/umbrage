@@ -40,6 +40,12 @@ Page {
     ]
     property var selectedVersion: ({})
 
+    // Codename, vendor, and model for the exported template. Filled from the
+    // selected template in populateFromSelectedTemplate().
+    property string codename: ""
+    property string vendor: ""
+    property string model: ""
+
     // Leaving the export flow collapses the drill-down stack back to the
     // template list so it starts fresh next time.
     onCurrentOperationChanged: {
@@ -114,6 +120,59 @@ Page {
     function togglePartition(index) {
         page.partitions = Utils.updateAt(page.partitions, index, function (entry) {
             entry.checked = !entry.checked;
+        });
+    }
+
+    // Appends a blank template version and opens it for editing.
+    function addVersion() {
+        var entry = {
+            name: "",
+            description: "",
+            da: "",
+            auth: "",
+            preloader: "",
+            default: false
+        };
+        page.versions = page.versions.concat([entry]);
+        page.selectedVersion = entry;
+        exportStack.push(exportVersionComponent);
+    }
+
+    // Removes the version at `index` and re-assigns a fresh array so the
+    // version list bindings re-evaluate.
+    function removeVersion(index) {
+        page.versions = page.versions.filter(function (entry, i) {
+            return i !== index;
+        });
+    }
+
+    // Fills the export fields from the template picked in the templates flow.
+    // Looks the device up in AppState.repo and copies its versions into the
+    // { name, description, da, auth, preloader, default } entries the panel
+    // renders.
+    function populateFromSelectedTemplate() {
+        if (AppState.selected_codename === "")
+            return;
+
+        var repo = JSON.parse(AppState.repo);
+        var device = repo.devices[AppState.selected_codename];
+        if (device === undefined)
+            return;
+
+        page.codename = AppState.selected_codename;
+        page.vendor = device.vendor;
+        page.model = device.model;
+
+        page.versions = device.versions.map(function (version) {
+            var files = version.files || {};
+            return {
+                name: version.name,
+                description: version.description,
+                da: files.da ? files.da.name : "",
+                auth: files.auth ? files.auth.name : "",
+                preloader: files.preloader ? files.preloader.name : "",
+                default: !!version.default
+            };
         });
     }
 
@@ -192,6 +251,8 @@ Page {
                     confirmDialog.open();
                 } else {
                     page.resetPartitions();
+                    if (key === "export_template")
+                        page.populateFromSelectedTemplate();
                     page.currentOperation = key;
                 }
             }
@@ -279,8 +340,15 @@ Page {
 
                     ExportTemplatePanel {
                         versions: page.versions
+                        codename: page.codename
+                        vendor: page.vendor
+                        model: page.model
 
                         onBackRequested: page.currentOperation = ""
+                        onAddVersionRequested: page.addVersion()
+                        onRemoveVersionRequested: function (index) {
+                            page.removeVersion(index);
+                        }
                         onVersionSelected: function (index) {
                             page.selectedVersion = page.versions[index];
                             exportStack.push(exportVersionComponent);

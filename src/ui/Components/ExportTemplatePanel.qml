@@ -12,12 +12,14 @@ Item {
     // { name, description, da, auth, preloader, default }
     property var versions: []
 
-    property string codename: "codename"
-    property string vendor: "vendor"
-    property string model: "model"
+    property string codename: ""
+    property string vendor: ""
+    property string model: ""
 
     signal backRequested
     signal versionSelected(int index)
+    signal addVersionRequested
+    signal removeVersionRequested(int index)
 
     Layout.fillWidth: true
     Layout.fillHeight: true
@@ -84,19 +86,43 @@ Item {
                     }
                 }
 
-                UText {
-                    Layout.fillWidth: true
-                    level: "title"
-                    text: "Template versions"
-                }
+                ColumnLayout {
+                    spacing: Styles.spacing
 
-                TemplateVersionList {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    versions: root.versions
+                    RowLayout {
+                        Layout.fillWidth: true
+                        spacing: Styles.spacing
 
-                    onVersionToggled: function (index) {
-                        root.versionSelected(index);
+                        UText {
+                            Layout.fillWidth: true
+                            level: "title"
+                            text: "Template versions"
+                        }
+
+                        UButton {
+                            Layout.preferredWidth: 40
+                            Layout.preferredHeight: 40
+
+                            text: "+"
+                            backgroundColor: Styles.surfaceHigh
+                            radius: width / 2
+
+                            onClicked: root.addVersionRequested()
+                        }
+                    }
+
+                    TemplateVersionList {
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                        versions: root.versions
+
+                        onVersionToggled: function (index) {
+                            root.versionSelected(index);
+                        }
+
+                        onRemoveVersionRequested: function (index) {
+                            root.removeVersionRequested(index);
+                        }
                     }
                 }
             }

@@ -92,8 +92,11 @@ Rectangle {
 
                         // Remove button
                         UButton {
+                            visible: index !== 0
+
                             iconDisplay: Button.IconOnly
                             iconPath: "qrc:/assets/trash-icon.svg"
+                            onClicked: root.removeVersionRequested(index)
                         }
                     }
                 }
