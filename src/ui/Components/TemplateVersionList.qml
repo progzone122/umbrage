@@ -54,14 +54,17 @@ Rectangle {
                     Layout.preferredHeight: contentColumn.implicitHeight + Styles.spacing
                     Layout.minimumHeight: 40
 
-                    color: modelData.checked ? Styles.surfaceHigh : Styles.surface
+                    color: rowMouse.pressed ? Qt.lighter(modelData.checked ? Styles.surfaceHigh : Styles.surface, 1.1) : rowMouse.containsMouse ? Qt.lighter(modelData.checked ? Styles.surfaceHigh : Styles.surface, 1.05) : modelData.checked ? Styles.surfaceHigh : Styles.surface
 
                     radius: Styles.radiusMedium
 
                     // Full-row toggle sits behind the interactive children so
                     // the checkbox/button still get the click.
                     MouseArea {
+                        id: rowMouse
+
                         anchors.fill: parent
+                        hoverEnabled: true
                         onClicked: root.versionToggled(index)
                     }
 
