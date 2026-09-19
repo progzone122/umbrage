@@ -21,6 +21,7 @@ TextField {
 
     // Background color and corner radius, overridable per instance.
     property color backgroundColor: Styles.surfaceHigh
+    property color hoveredBackgroundColor: Qt.lighter(Styles.surfaceHigh, 1.1)
     property color focusedBackgroundColor: Qt.darker(Styles.surfaceHigh, 1.2)
     property int backgroundRadius: Styles.radiusMedium
 
@@ -48,6 +49,6 @@ TextField {
 
     background: Rectangle {
         radius: root.backgroundRadius
-        color: root.activeFocus ? root.focusedBackgroundColor : root.backgroundColor
+        color: root.activeFocus ? root.focusedBackgroundColor : root.hovered ? root.hoveredBackgroundColor : root.backgroundColor
     }
 }
