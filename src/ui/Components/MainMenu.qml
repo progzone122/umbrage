@@ -134,6 +134,7 @@ Item {
 
                 ColumnLayout {
                     Layout.fillWidth: true
+                    Layout.minimumWidth: 0
                     spacing: 0
 
                     Label {
@@ -153,10 +154,6 @@ Item {
                         Layout.fillWidth: true
                         elide: Text.ElideRight
                     }
-                }
-
-                Item {
-                    Layout.fillWidth: true
                 }
 
                 Button {
