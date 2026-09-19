@@ -48,43 +48,27 @@ Item {
                 }
             }
 
-            ColumnLayout {
-                Layout.fillWidth: true
-                spacing: 4
-
-                UText {
-                    Layout.fillWidth: true
-                    level: "title"
-                    text: root.version.name ? root.version.name : ""
-                }
-
-                UText {
-                    Layout.fillWidth: true
-                    level: "body"
-                    color: Styles.surfaceForeground
-                    text: root.version.description ? root.version.description : ""
-                }
-            }
-
             UInputField {
                 Layout.fillWidth: true
-                title: "Download Agent (DA)"
-                placeholder: "/path/to/da.bin"
+                title: "Version name"
+                placeholder: "Carbonara Exploit / Unlocked BL / Official Signed Flashing"
                 value: root.version.da ? root.version.da : ""
             }
 
             UInputField {
                 Layout.fillWidth: true
-                title: "Auth file"
-                placeholder: "/path/to/auth.bin"
+                title: "Version description"
+                placeholder: "Enter a few words about this files. Are there any restrictions?"
                 value: root.version.auth ? root.version.auth : ""
             }
 
-            UInputField {
-                Layout.fillWidth: true
-                title: "Preloader"
-                placeholder: "/path/to/preloader.bin"
-                value: root.version.preloader ? root.version.preloader : ""
+            RowLayout {
+                UChooserField {
+                    Layout.fillWidth: true
+                    title: "DA"
+                    icon: "qrc:/assets/da_icon.svg"
+                    value: root.version.da ? root.version.da : "dsfdsfds"
+                }
             }
 
             Item {

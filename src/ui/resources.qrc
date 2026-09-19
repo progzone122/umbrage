@@ -56,6 +56,7 @@
         <file alias="Components/UPopupMenu.qml">Components/UPopupMenu.qml</file>
         <file alias="Components/UInput.qml">Components/UInput.qml</file>
         <file alias="Components/UInputField.qml">Components/UInputField.qml</file>
+        <file alias="Components/UChooserField.qml">Components/UChooserField.qml</file>
 
         <file alias="UmbrageStyles/qmldir">UmbrageStyles/qmldir</file>
         <file alias="UmbrageStyles/Styles.qml">UmbrageStyles/Styles.qml</file>
