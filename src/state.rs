@@ -349,7 +349,7 @@ impl Default for AppState {
             da_file: String::new(),
             auth_file: String::new(),
             preloader_file: String::new(),
-            page: Page::Main as u8,
+            page: Page::Steps as u8,
             logs: Vec::new(),
             repo: String::new(),
             connected: false,

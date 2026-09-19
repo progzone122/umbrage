@@ -257,7 +257,7 @@ Page {
                 {
                     key: "export_template",
                     section: "other",
-                    text: "Export template"
+                    text: "Template generator"
                 },
             ]
 
