@@ -40,6 +40,7 @@ TextField {
     color: root.textColor
     placeholderTextColor: root.placeholderColor
     font.pixelSize: root.fontSize
+    font.weight: 600
     selectByMouse: true
 
     leftPadding: root.uiLeftPadding

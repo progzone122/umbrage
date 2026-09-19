@@ -85,6 +85,7 @@ Rectangle {
                                 text: modelData.name
                                 color: Styles.surfaceForeground
                                 font.pixelSize: 15
+                                font.weight: 700
                                 verticalAlignment: Text.AlignVCenter
                             }
                         }

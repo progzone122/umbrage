@@ -294,7 +294,12 @@ Page {
                     ExportTemplateVersionPanel {
                         version: page.selectedVersion
 
-                        onBackRequested: exportStack.pop()
+                        onBackRequested: {
+                            // Re-assign a fresh array so the version list
+                            // bindings re-evaluate the edited entries.
+                            page.versions = page.versions.slice();
+                            exportStack.pop();
+                        }
                     }
                 }
             }

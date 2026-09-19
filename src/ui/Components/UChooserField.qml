@@ -34,12 +34,12 @@ ColumnLayout {
 
         iconDisplay: Button.TextBesideIcon
         iconPath: root.icon
-        text: Utils.baseName(root.value)
+        text: root.value ? Utils.baseName(root.value) : "Choose file"
 
         contentAlignment: Qt.AlignLeft
 
-        font.bold: false
         font.pixelSize: 16
+        font.weight: 600
 
         padding: 12
 

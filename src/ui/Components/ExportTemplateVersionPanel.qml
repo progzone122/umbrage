@@ -52,14 +52,16 @@ Item {
                 Layout.fillWidth: true
                 title: "Version name"
                 placeholder: "Carbonara Exploit / Unlocked BL / Official Signed Flashing"
-                value: root.version.da ? root.version.da : ""
+                value: root.version.name ? root.version.name : ""
+                onValueChanged: root.version.name = value
             }
 
             UInputField {
                 Layout.fillWidth: true
                 title: "Version description"
                 placeholder: "Enter a few words about this files. Are there any restrictions?"
-                value: root.version.auth ? root.version.auth : ""
+                value: root.version.description ? root.version.description : ""
+                onValueChanged: root.version.description = value
             }
 
             RowLayout {
@@ -70,12 +72,14 @@ Item {
                     title: "DA"
                     icon: "qrc:/assets/da_icon.svg"
                     value: root.version.da ? root.version.da : ""
+                    onValueChanged: root.version.da = value
                 }
                 UChooserField {
                     Layout.fillWidth: true
                     title: "Auth"
                     icon: "qrc:/assets/auth_icon.svg"
                     value: root.version.auth ? root.version.auth : ""
+                    onValueChanged: root.version.auth = value
                 }
 
                 UChooserField {
@@ -83,7 +87,15 @@ Item {
                     title: "Preloader"
                     icon: "qrc:/assets/preloader_icon.svg"
                     value: root.version.preloader ? root.version.preloader : ""
+                    onValueChanged: root.version.preloader = value
                 }
+            }
+
+            UCheckRow {
+                Layout.fillWidth: true
+                text: "Recommend this as the default version"
+                checked: root.version.default
+                onCheckedChanged: root.version.default = checked
             }
 
             Item {

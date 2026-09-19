@@ -18,3 +18,4 @@ TemplateVersionList 1.0 TemplateVersionList.qml
 ExportTemplatePanel 1.0 ExportTemplatePanel.qml
 ExportTemplateVersionPanel 1.0 ExportTemplateVersionPanel.qml
 UChooserField 1.0 UChooserField.qml
+UCheckRow 1.0 UCheckRow.qml
