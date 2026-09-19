@@ -17,6 +17,9 @@ Item {
     property string vendor: ""
     property string model: ""
 
+    // Export requires a codename, vendor, model, and at least one version.
+    readonly property bool canExport: root.codename.trim() !== "" && root.vendor.trim() !== "" && root.model.trim() !== "" && root.versions.length > 0
+
     signal backRequested
     signal versionSelected(int index)
     signal addVersionRequested
@@ -177,6 +180,7 @@ Item {
 
                     text: qsTr("Export template")
                     backgroundColor: Styles.surfaceHigh
+                    disabled: !root.canExport
 
                     onClicked: root.openExportDialog()
                 }
