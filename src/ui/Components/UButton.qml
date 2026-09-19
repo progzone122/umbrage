@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Controls
+import QtQuick.Controls.impl
 import UmbrageStyles 1.0
 
 Button {
@@ -19,6 +20,10 @@ Button {
 
     // Background radius. Set to half the size for a round button.
     property int radius: Styles.radiusMedium
+
+    // Horizontal alignment of the icon/text content:
+    // Qt.AlignLeft, Qt.AlignHCenter (default), or Qt.AlignRight.
+    property int contentAlignment: Qt.AlignHCenter
 
     enabled: !root.disabled
 
@@ -41,6 +46,19 @@ Button {
     icon.color: effectiveForeground
     icon.width: 16
     icon.height: 16
+
+    contentItem: IconLabel {
+        spacing: root.spacing
+        mirrored: root.mirrored
+        display: root.iconDisplay
+
+        icon: root.icon
+        text: root.text
+        font: root.font
+        color: root.palette.buttonText
+
+        alignment: root.contentAlignment | Qt.AlignVCenter
+    }
 
     background: Rectangle {
         radius: root.radius

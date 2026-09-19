@@ -3,7 +3,8 @@ mod icon_bridge;
 mod logs;
 mod platform;
 mod state;
-mod templates;
+
+pub use umbrage::templates;
 
 use std::env;
 

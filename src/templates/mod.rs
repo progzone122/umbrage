@@ -4,12 +4,13 @@ use std::{path::Path, path::PathBuf};
 
 use sha2::{Digest, Sha256};
 
+pub mod export;
 pub mod model;
 
 const ENDPOINT: &str = "https://progzone122.github.io/umbrage-repo";
 
-/// Requests must not hang forever: a stalled connection would leave the
-/// templates page spinning with no way out.
+/// Requests must not hang forever. A stalled connection would leave the
+/// templates page stuck spinning.
 const HTTP_TIMEOUT: Duration = Duration::from_secs(20);
 
 fn http_client() -> Result<reqwest::Client, String> {
@@ -21,11 +22,11 @@ fn http_client() -> Result<reqwest::Client, String> {
 
 /// Marker returned when the user cancels an operation. Callers compare against
 /// it to tell a cancellation apart from a real failure.
-pub(crate) const CANCELLED: &str = "Cancelled by the user";
+pub const CANCELLED: &str = "Cancelled by the user";
 
 /// Resolves as soon as `cancel` is set. Used with `tokio::select!` to drop an
 /// in-flight request instead of waiting for it to finish.
-pub(crate) async fn wait_cancelled(cancel: &AtomicBool) {
+pub async fn wait_cancelled(cancel: &AtomicBool) {
     while !cancel.load(Ordering::SeqCst) {
         tokio::time::sleep(Duration::from_millis(50)).await;
     }
@@ -43,15 +44,15 @@ pub async fn fetch_meta_json() -> Result<String, String> {
         .await
         .map_err(|e| format!("Failed to read meta.json body: {e}"))?;
 
-    // Reject malformed JSON here: QML's JSON.parse would throw and leave the
-    // page half-initialized.
-    serde_json::from_str::<serde_json::Value>(&body)
-        .map_err(|e| format!("Invalid meta.json: {e}"))?;
+    // Reject bad metadata before it reaches QML. Parsing into `Meta` instead
+    // of a bare `serde_json::Value` also catches a missing field or wrong shape
+    // early.
+    serde_json::from_str::<model::Meta>(&body).map_err(|e| format!("Invalid meta.json: {e}"))?;
 
     Ok(body)
 }
 
-pub(crate) async fn download_file(
+pub async fn download_file(
     file: &model::TemplateFileData,
     dest: &Path,
     progress: &impl Fn(u64, u64),
@@ -105,8 +106,9 @@ pub struct ResolvedFiles {
     pub preloader: Option<PathBuf>,
 }
 
-// Downloads every file in `files` into the temp dir, then maps them onto their
-// roles (da/auth/preloader). Aborts with `CANCELLED` when the user cancels.
+// Downloads every file in `files` into the temp dir, then maps the da, auth,
+// and preloader files onto their local paths. Aborts with `CANCELLED` when the
+// user cancels.
 pub async fn resolve_template_files(
     files: &model::TemplateFile,
     cancel: &AtomicBool,
@@ -115,7 +117,7 @@ pub async fn resolve_template_files(
     let mut resolved = ResolvedFiles::default();
     let count = files.0.len();
 
-    for (index, (key, data)) in files.0.iter().enumerate() {
+    for (index, (file, data)) in files.0.iter().enumerate() {
         if cancel.load(Ordering::SeqCst) {
             return Err(CANCELLED.to_string());
         }
@@ -128,7 +130,7 @@ pub async fn resolve_template_files(
             () = wait_cancelled(cancel) => return Err(CANCELLED.to_string()),
         }
 
-        match key.as_str() {
+        match file.as_str() {
             "da" => resolved.da = Some(dest),
             "auth" => resolved.auth = Some(dest),
             "preloader" => resolved.preloader = Some(dest),

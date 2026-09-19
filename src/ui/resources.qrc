@@ -23,6 +23,7 @@
         <file alias="search-icon.svg">Assets/search-icon.svg</file>
         <file alias="collapse-icon.svg">Assets/collapse-icon.svg</file>
         <file alias="more-icon.svg">Assets/more-icon.svg</file>
+        <file alias="trash-icon.svg">Assets/trash-icon.svg</file>
     </qresource>
 
     <qresource prefix="/qml">
@@ -44,10 +45,19 @@
         <file alias="Components/CollapsibleSection.qml">Components/CollapsibleSection.qml</file>
         <file alias="Components/ModalDialog.qml">Components/ModalDialog.qml</file>
         <file alias="Components/PartitionList.qml">Components/PartitionList.qml</file>
+        <file alias="Components/TemplateVersionList.qml">Components/TemplateVersionList.qml</file>
         <file alias="Components/OperationPanel.qml">Components/OperationPanel.qml</file>
+        <file alias="Components/ExportTemplatePanel.qml">Components/ExportTemplatePanel.qml</file>
+        <file alias="Components/ExportTemplateVersionPanel.qml">Components/ExportTemplateVersionPanel.qml</file>
         <file alias="Components/WarningBlock.qml">Components/WarningBlock.qml</file>
+
+
         <file alias="Components/UText.qml">Components/UText.qml</file>
         <file alias="Components/UPopupMenu.qml">Components/UPopupMenu.qml</file>
+        <file alias="Components/UInput.qml">Components/UInput.qml</file>
+        <file alias="Components/UInputField.qml">Components/UInputField.qml</file>
+        <file alias="Components/UChooserField.qml">Components/UChooserField.qml</file>
+        <file alias="Components/UCheckRow.qml">Components/UCheckRow.qml</file>
 
         <file alias="UmbrageStyles/qmldir">UmbrageStyles/qmldir</file>
         <file alias="UmbrageStyles/Styles.qml">UmbrageStyles/Styles.qml</file>

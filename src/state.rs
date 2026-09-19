@@ -30,6 +30,7 @@ pub struct AppState {
     pub(crate) chip_name: String,
     pub(crate) chip_platform: String,
     pub(crate) device_name: String,
+    pub(crate) selected_codename: String,
     pub(crate) connection_error: String,
     pub(crate) device_tx: Arc<Mutex<Option<Sender<DeviceCommand>>>>,
     pub(crate) need_setup: bool,
@@ -64,6 +65,11 @@ impl AppState {
         "device_name",
         Member = device_name,
         Notify = device_name_changed
+    );
+    qproperty!(
+        "selected_codename",
+        Member = selected_codename,
+        Notify = selected_codename_changed
     );
     qproperty!(
         "connection_error",
@@ -132,6 +138,9 @@ impl AppState {
     pub(crate) fn device_name_changed(&mut self);
 
     #[qsignal]
+    pub(crate) fn selected_codename_changed(&mut self);
+
+    #[qsignal]
     pub(crate) fn connection_error_changed(&mut self);
 
     #[qsignal]
@@ -169,6 +178,9 @@ impl AppState {
 
     #[qsignal]
     pub(crate) fn template_progress(&mut self, message: String, percent: i32);
+
+    #[qsignal]
+    pub(crate) fn export_finished(&mut self, success: bool, message: String);
 
     #[qsignal]
     pub(crate) fn bootloader_lock_progress(&mut self, message: String);
@@ -242,6 +254,16 @@ impl AppState {
     #[qslot]
     fn template_download_failed(&mut self, files_json: String) {
         callbacks::templates::template_download_failed(self, files_json);
+    }
+
+    #[qslot]
+    fn export_template(&mut self, payload_json: String, dest: String) {
+        callbacks::export::export_template(self, payload_json, dest);
+    }
+
+    #[qslot]
+    fn export_result(&mut self, success: bool, message: String) {
+        callbacks::export::export_result(self, success, message);
     }
 
     #[qslot]
@@ -335,6 +357,7 @@ impl Default for AppState {
             chip_name: String::new(),
             chip_platform: String::new(),
             device_name: String::new(),
+            selected_codename: String::new(),
             connection_error: String::new(),
             device_tx: Arc::new(Mutex::new(None)),
             need_setup: false,

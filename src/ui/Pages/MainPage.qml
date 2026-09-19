@@ -27,6 +27,23 @@ Page {
     property int pendingFileIndex: -1
     property string outputDirectory: ""
 
+    // { name, description, da, auth, preloader, default }
+    property var versions: []
+    property var selectedVersion: ({})
+
+    // Codename, vendor, and model for the exported template. Filled from the
+    // selected template in populateFromSelectedTemplate().
+    property string codename: ""
+    property string vendor: ""
+    property string model: ""
+
+    // Leaving the export flow collapses the drill-down stack back to the
+    // template list so it starts fresh next time.
+    onCurrentOperationChanged: {
+        if (page.currentOperation !== "export_template" && exportStack.depth > 1)
+            exportStack.pop(null);
+    }
+
     // Fetch the real partition table when the page becomes visible with a
     // device connected.
     onVisibleChanged: {
@@ -97,6 +114,88 @@ Page {
         });
     }
 
+    // Appends a blank template version and opens it for editing.
+    function addVersion() {
+        var entry = {
+            name: "",
+            description: "",
+            da: {
+                path: "",
+                name: "",
+                sha256: ""
+            },
+            auth: {
+                path: "",
+                name: "",
+                sha256: ""
+            },
+            preloader: {
+                path: "",
+                name: "",
+                sha256: ""
+            },
+            default: false
+        };
+        page.versions = page.versions.concat([entry]);
+        page.selectedVersion = entry;
+        exportStack.push(exportVersionComponent);
+    }
+
+    // Removes the version at `index` and re-assigns a fresh array so the
+    // version list bindings re-evaluate.
+    function removeVersion(index) {
+        page.versions = page.versions.filter(function (entry, i) {
+            return i !== index;
+        });
+    }
+
+    // Fills the export fields from the template picked in the templates flow.
+    // Looks the device up in AppState.repo and copies its versions into the
+    // { name, description, da, auth, preloader, default } entries the panel
+    // renders. Files carry the repo name + checksum so the export can reuse
+    // them without reading local files, which only exist for the version the
+    // user downloaded.
+    function populateFromSelectedTemplate() {
+        if (AppState.selected_codename === "")
+            return;
+
+        var repo = JSON.parse(AppState.repo);
+        var device = repo.devices[AppState.selected_codename];
+        if (device === undefined)
+            return;
+
+        page.codename = AppState.selected_codename;
+        page.vendor = device.vendor;
+        page.model = device.model;
+
+        page.versions = device.versions.map(function (version) {
+            var files = version.files || {};
+            return {
+                name: version.name,
+                description: version.description,
+                da: page.templateFile(files.da),
+                auth: page.templateFile(files.auth),
+                preloader: page.templateFile(files.preloader),
+                default: !!version.default
+            };
+        });
+    }
+
+    // Turns a repo file entry into a slot the chooser/export understand.
+    function templateFile(repoFile) {
+        if (!repoFile)
+            return {
+                path: "",
+                name: "",
+                sha256: ""
+            };
+        return {
+            path: "",
+            name: repoFile.name || "",
+            sha256: repoFile.sha256 || ""
+        };
+    }
+
     // Applies a parsed scatter file's entries to the partition table. Entries
     // match by exact name. Downloadable matches get checked and their file path
     // set.
@@ -154,7 +253,12 @@ Page {
                     key: "write",
                     section: "flashing",
                     text: "Write partitions"
-                }
+                },
+                {
+                    key: "export_template",
+                    section: "other",
+                    text: "Template generator"
+                },
             ]
 
             onActionRequested: function (key) {
@@ -167,6 +271,8 @@ Page {
                     confirmDialog.open();
                 } else {
                     page.resetPartitions();
+                    if (key === "export_template")
+                        page.populateFromSelectedTemplate();
                     page.currentOperation = key;
                 }
             }
@@ -212,7 +318,7 @@ Page {
             OperationPanel {
                 id: operationPanel
 
-                visible: page.currentOperation !== ""
+                visible: page.currentOperation == "read" || page.currentOperation == "write"
 
                 Layout.fillWidth: true
                 Layout.fillHeight: true
@@ -237,6 +343,53 @@ Page {
                     page.togglePartition(index);
                 }
                 onActionRequested: page.openOperationDialog()
+            }
+
+            StackView {
+                id: exportStack
+
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                visible: page.currentOperation == "export_template"
+                clip: true
+
+                initialItem: exportTemplateComponent
+
+                Component {
+                    id: exportTemplateComponent
+
+                    ExportTemplatePanel {
+                        versions: page.versions
+                        codename: page.codename
+                        vendor: page.vendor
+                        model: page.model
+
+                        onBackRequested: page.currentOperation = ""
+                        onAddVersionRequested: page.addVersion()
+                        onRemoveVersionRequested: function (index) {
+                            page.removeVersion(index);
+                        }
+                        onVersionSelected: function (index) {
+                            page.selectedVersion = page.versions[index];
+                            exportStack.push(exportVersionComponent);
+                        }
+                    }
+                }
+
+                Component {
+                    id: exportVersionComponent
+
+                    ExportTemplateVersionPanel {
+                        version: page.selectedVersion
+
+                        onBackRequested: {
+                            // Re-assign a fresh array so the version list
+                            // bindings re-evaluate the edited entries.
+                            page.versions = page.versions.slice();
+                            exportStack.pop();
+                        }
+                    }
+                }
             }
         }
     }

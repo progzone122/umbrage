@@ -80,38 +80,21 @@ Page {
                 }
             }
 
-            TextField {
+            UInput {
                 id: searchField
 
-                Layout.fillWidth: true
                 Layout.preferredHeight: 44
                 Layout.alignment: Qt.AlignTop
 
+                backgroundColor: Styles.surface
                 visible: page.searching
+                autofocusOnVisible: true
                 activeFocusOnTab: true
+                placeholderColor: Styles.surfaceAlt
 
-                color: Styles.textPrimary
                 placeholderText: qsTr("Search…")
-                placeholderTextColor: Styles.surfaceAlt
-                font.pixelSize: 16
-                selectByMouse: true
-
-                leftPadding: 12
-                rightPadding: 12
-                topPadding: 10
-                bottomPadding: 10
-
-                background: Rectangle {
-                    radius: Styles.radiusMedium
-                    color: Styles.surface
-                }
 
                 onTextChanged: page.searchQuery = text
-
-                onVisibleChanged: {
-                    if (visible)
-                        forceActiveFocus();
-                }
             }
 
             Button {

@@ -23,6 +23,16 @@ QtObject {
         return value.substring(0, max - 3) + "…";
     }
 
+    // Returns the final path segment (file/folder name) without any directory
+    // prefix or trailing slash, e.g. "file:///a/b/c.txt" -> "c.txt".
+    function baseName(value) {
+        if (typeof value !== "string")
+            return value;
+        var trimmed = value.replace(/[\/\\]+$/, "");
+        var idx = Math.max(trimmed.lastIndexOf("/"), trimmed.lastIndexOf("\\"));
+        return idx >= 0 ? trimmed.substring(idx + 1) : trimmed;
+    }
+
     // --- Asset icons -------------------------------------------------------
 
     // Maps a logical file/type key to its asset path. Returns "" for unknown
