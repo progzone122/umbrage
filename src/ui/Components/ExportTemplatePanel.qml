@@ -10,16 +10,7 @@ Item {
     id: root
 
     // { name, description, da, auth, preloader, default }
-    property var versions: [
-        {
-            name: "Carbonara Exploit",
-            description: "version description",
-            da: "",
-            auth: "",
-            preloader: "",
-            default: true
-        }
-    ]
+    property var versions: []
 
     property string codename: "codename"
     property string vendor: "vendor"
@@ -43,6 +34,7 @@ Item {
 
             ColumnLayout {
                 Layout.fillWidth: true
+                Layout.fillHeight: true
                 spacing: Styles.spacing
 
                 RowLayout {
@@ -62,47 +54,42 @@ Item {
                     }
                 }
 
-                ColumnLayout {
-                    Layout.margins: Styles.spacing
+                UInputField {
+                    Layout.fillWidth: true
+                    title: "Codename"
+                    placeholder: "penangf"
+                    value: root.codename
+                }
+
+                RowLayout {
+                    Layout.fillWidth: true
                     spacing: Styles.spacing
 
                     UInputField {
-                        title: "Codename"
-                        placeholder: "penangf"
-                        value: root.codename
+                        Layout.fillWidth: true
+                        title: "Vendor"
+                        placeholder: "Motorola"
+                        value: root.vendor
                     }
 
-                    RowLayout {
-                        spacing: Styles.spacing
-
-                        UInputField {
-                            title: "Vendor"
-                            placeholder: "Motorola"
-                            value: root.vendor
-                        }
-
-                        UInputField {
-                            title: "Model"
-                            placeholder: "G13/G23"
-                            value: root.model
-                        }
-                    }
-
-                    ColumnLayout {
-                        UText {
-                            level: "title"
-                            text: "Template versions"
-                        }
-
-                        TemplateList {
-                            versions: root.versions
-                        }
+                    UInputField {
+                        Layout.fillWidth: true
+                        title: "Model"
+                        placeholder: "G13/G23"
+                        value: root.model
                     }
                 }
 
-                Item {
+                UText {
+                    Layout.fillWidth: true
+                    level: "title"
+                    text: "Template versions"
+                }
+
+                TemplateList {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
+                    versions: root.versions
                 }
             }
         }

@@ -21,6 +21,8 @@ Rectangle {
     border.width: 4
     border.color: Styles.surface
 
+    implicitHeight: 120
+
     Flickable {
         id: flickable
 
@@ -43,7 +45,7 @@ Rectangle {
             spacing: Styles.spacing / 2
 
             Repeater {
-                model: root.templates
+                model: root.versions
 
                 delegate: Rectangle {
                     id: row
@@ -71,25 +73,15 @@ Rectangle {
                         anchors.rightMargin: Styles.spacing / 2
                         spacing: Styles.spacing / 2
 
-                        ColumnLayout {
+                        RowLayout {
                             Layout.fillWidth: true
                             spacing: 2
 
                             Label {
                                 Layout.fillWidth: true
-                                text: modelData.name + " (" + modelData.size + ")"
+                                text: modelData.name
                                 color: Styles.surfaceForeground
                                 font.pixelSize: 15
-                                verticalAlignment: Text.AlignVCenter
-                            }
-
-                            Label {
-                                Layout.fillWidth: true
-                                visible: modelData.file !== undefined && modelData.file !== ""
-                                text: modelData.file !== undefined ? modelData.file : ""
-                                color: Styles.surfaceAlt
-                                font.pixelSize: 11
-                                elide: Text.ElideMiddle
                                 verticalAlignment: Text.AlignVCenter
                             }
                         }

@@ -247,6 +247,17 @@ Page {
             ExportTemplatePanel {
                 visible: page.currentOperation == "export_template"
 
+                versions: [
+                    {
+                        name: "Carbonara Exploit",
+                        description: "version description",
+                        da: "",
+                        auth: "",
+                        preloader: "",
+                        default: true
+                    }
+                ]
+
                 Layout.fillWidth: true
                 Layout.fillHeight: true
 
