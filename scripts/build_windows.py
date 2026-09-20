@@ -33,7 +33,7 @@ CACHE_DIR = Path.home() / ".cache" / "umbrage-cross"
 DIST_DIR = PROJECT_ROOT / "dist"
 PAYLOAD_DIR = DIST_DIR / "umbrage-windows"
 APP_NAME = "Umbrage"
-APP_VERSION = "0.1.0"
+APP_VERSION = "0.1.1"
 
 
 def log(msg: str) -> None:

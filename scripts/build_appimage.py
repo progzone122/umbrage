@@ -35,7 +35,7 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 TARGET = "x86_64-unknown-linux-gnu"
 APP_NAME = "Umbrage"
-APP_VERSION = "0.1.0"
+APP_VERSION = "0.1.1"
 CACHE_DIR = Path.home() / ".cache" / "umbrage-cross"
 TOOLS_DIR = CACHE_DIR / "appimage-tools"
 DIST_DIR = PROJECT_ROOT / "dist"

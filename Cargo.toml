@@ -1,6 +1,6 @@
 [package]
 name = "umbrage"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2024"
 description = "🌑 ✨ Your first and last tool for flashing and exploring MTK devices"
 license = "AGPL-3.0-or-later"
