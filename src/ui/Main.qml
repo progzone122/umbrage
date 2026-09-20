@@ -134,6 +134,8 @@ ApplicationWindow {
                 if (AppState.page === root.pageSteps) {
                     stack.clear();
                     stack.push(setupComponent);
+                } else if (AppState.page === root.pageWaitConn && AppState.skip_conn_page) {
+                    root.setPage(root.pageMain);
                 }
             }
         }
@@ -143,32 +145,31 @@ ApplicationWindow {
             show_step_badges: AppState.page == root.pageSteps
         }
 
-        StackView {
-            id: stack
+        StackLayout {
+            id: pageStack
             Layout.fillWidth: true
             Layout.fillHeight: true
-            visible: AppState.page === root.pageSteps
+            currentIndex: AppState.page
 
-            Component.onCompleted: stack.push(setupComponent)
-        }
+            StackView {
+                id: stack
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                Component.onCompleted: stack.push(setupComponent)
+            }
 
-        SetupPage {
-            visible: AppState.page === root.pageSetup
-            onContinueRequested: root.setPage(root.pageWaitConn)
-        }
+            WaitConnectionPage {}
 
-        WaitConnectionPage {
-            visible: AppState.page === root.pageWaitConn
-        }
+            MainPage {}
 
-        TemplatesPage {
-            visible: AppState.page === root.pageTemplates
-            onFinished: root.continueToDevice()
-            onCancelled: root.setPage(root.pageSteps)
-        }
+            TemplatesPage {
+                onFinished: root.continueToDevice()
+                onCancelled: root.setPage(root.pageSteps)
+            }
 
-        MainPage {
-            visible: AppState.page === root.pageMain
+            SetupPage {
+                onContinueRequested: root.setPage(root.pageWaitConn)
+            }
         }
     }
 
