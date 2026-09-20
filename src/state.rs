@@ -1,8 +1,9 @@
+use std::env;
 use std::sync::atomic::AtomicBool;
 use std::sync::mpsc::Sender;
 use std::sync::{Arc, Mutex};
 
-use qtbridge::qobject;
+use qtbridge::{qobject, qsignal};
 
 use crate::callbacks;
 use crate::callbacks::device::DeviceCommand;
@@ -20,6 +21,7 @@ pub enum Page {
 
 pub struct AppState {
     pub(crate) page: u8,
+    pub(crate) skip_conn_page: bool,
     pub(crate) da_file: String,
     pub(crate) auth_file: String,
     pub(crate) preloader_file: String,
@@ -45,6 +47,11 @@ pub struct AppState {
 #[qobject(Singleton, ConvertToCamelCase)]
 impl AppState {
     qproperty!("page", Member = page, Notify = page_changed);
+    qproperty!(
+        "skip_conn_page",
+        Member = skip_conn_page,
+        Notify = skip_conn_page_changed
+    );
     qproperty!("da_file", Member = da_file, Notify = da_file_changed);
     qproperty!("auth_file", Member = auth_file, Notify = auth_file_changed);
     qproperty!(
@@ -109,6 +116,9 @@ impl AppState {
 
     #[qsignal]
     pub(crate) fn page_changed(&mut self);
+
+    #[qsignal]
+    pub(crate) fn skip_conn_page_changed(&mut self);
 
     #[qsignal]
     pub(crate) fn da_file_changed(&mut self);
@@ -350,6 +360,7 @@ impl Default for AppState {
             auth_file: String::new(),
             preloader_file: String::new(),
             page: Page::Steps as u8,
+            skip_conn_page: env::args().any(|arg| arg == "--skip-conn"),
             logs: Vec::new(),
             repo: String::new(),
             connected: false,
