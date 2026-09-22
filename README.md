@@ -1,8 +1,8 @@
+<img src="./docs/banner.webp" alt="Umbrage banner">
+
 # Umbrage
 
 [English](./README.md) | [Русский](./README_ru.md)
-
-<img src="./docs/banner.webp" alt="Umbrage banner">
 
 Umbrage is a cross-platform GUI tool for working with MediaTek SOC-based devices, built on top of the [penumbra](https://github.com/shomykohai/penumbra) core.
 
@@ -48,7 +48,7 @@ This allows unlocking the bootloader on vulnerable devices with a single click.
 
 ### Writing/Dumping device partitions
 
-Umbrage provides a convenient tool for working with device memory, allowing you to back up (dump) and write individual partitions in just a few clicks.
+Umbrage provides a convenient tool for working with device memory, allowing you to backup (dump) and write individual partitions in just a few clicks.
 
 <div style="display: flex; flex-wrap: wrap;">
     <img src="./docs/screenshots/8.png" alt="Umbrage screenshot 8" width="500">
