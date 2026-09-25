@@ -4,65 +4,14 @@
     </qresource>
 
     <qresource prefix="/assets">
-        <file alias="auth_icon.svg">Assets/auth_icon.svg</file>
-        <file alias="da_icon.svg">Assets/da_icon.svg</file>
-        <file alias="device-icon.svg">Assets/device-icon.svg</file>
-        <file alias="disconnect-icon.svg">Assets/disconnect-icon.svg</file>
-        <file alias="docs_icon.svg">Assets/docs_icon.svg</file>
-        <file alias="ok-icon.svg">Assets/ok-icon.svg</file>
-        <file alias="preloader_icon.svg">Assets/preloader_icon.svg</file>
-        <file alias="progress_icon.svg">Assets/progress_icon.svg</file>
-        <file alias="template-icon.svg">Assets/template-icon.svg</file>
-        <file alias="terminal_icon.svg">Assets/terminal_icon.svg</file>
-        <file alias="umbrage-icon.svg">Assets/umbrage-icon.svg</file>
-        <file alias="umbrage-icon2.svg">Assets/umbrage-icon2.svg</file>
-        <file alias="usb_connected.svg">Assets/usb_connected.svg</file>
-        <file alias="vendor-icon.svg">Assets/vendor-icon.svg</file>
-        <file alias="choose-dir-icon.svg">Assets/choose-dir-icon.svg</file>
-        <file alias="flash-icon.svg">Assets/flash-icon.svg</file>
-        <file alias="search-icon.svg">Assets/search-icon.svg</file>
-        <file alias="collapse-icon.svg">Assets/collapse-icon.svg</file>
-        <file alias="more-icon.svg">Assets/more-icon.svg</file>
-        <file alias="trash-icon.svg">Assets/trash-icon.svg</file>
+        <file>Assets</file>
     </qresource>
 
     <qresource prefix="/qml">
-        <file alias="Pages/qmldir">Pages/qmldir</file>
-        <file alias="Pages/StepPage.qml">Pages/StepPage.qml</file>
-        <file alias="Pages/SetupPage.qml">Pages/SetupPage.qml</file>
-        <file alias="Pages/WaitConnectionPage.qml">Pages/WaitConnectionPage.qml</file>
-        <file alias="Pages/MainPage.qml">Pages/MainPage.qml</file>
-        <file alias="Pages/TemplatesPage.qml">Pages/TemplatesPage.qml</file>
-        <file alias="Pages/TemplateStepPage.qml">Pages/TemplateStepPage.qml</file>
-
-        <file alias="Components/qmldir">Components/qmldir</file>
-        <file alias="Components/UButton.qml">Components/UButton.qml</file>
-        <file alias="Components/TopPanel.qml">Components/TopPanel.qml</file>
-        <file alias="Components/TemplateItem.qml">Components/TemplateItem.qml</file>
-        <file alias="Components/UBadge.qml">Components/UBadge.qml</file>
-        <file alias="Components/MainMenu.qml">Components/MainMenu.qml</file>
-        <file alias="Components/MenuButton.qml">Components/MenuButton.qml</file>
-        <file alias="Components/CollapsibleSection.qml">Components/CollapsibleSection.qml</file>
-        <file alias="Components/ModalDialog.qml">Components/ModalDialog.qml</file>
-        <file alias="Components/PartitionList.qml">Components/PartitionList.qml</file>
-        <file alias="Components/TemplateVersionList.qml">Components/TemplateVersionList.qml</file>
-        <file alias="Components/OperationPanel.qml">Components/OperationPanel.qml</file>
-        <file alias="Components/ExportTemplatePanel.qml">Components/ExportTemplatePanel.qml</file>
-        <file alias="Components/ExportTemplateVersionPanel.qml">Components/ExportTemplateVersionPanel.qml</file>
-        <file alias="Components/WarningBlock.qml">Components/WarningBlock.qml</file>
-
-
-        <file alias="Components/UText.qml">Components/UText.qml</file>
-        <file alias="Components/UPopupMenu.qml">Components/UPopupMenu.qml</file>
-        <file alias="Components/UInput.qml">Components/UInput.qml</file>
-        <file alias="Components/UInputField.qml">Components/UInputField.qml</file>
-        <file alias="Components/UChooserField.qml">Components/UChooserField.qml</file>
-        <file alias="Components/UCheckRow.qml">Components/UCheckRow.qml</file>
-
-        <file alias="UmbrageStyles/qmldir">UmbrageStyles/qmldir</file>
-        <file alias="UmbrageStyles/Styles.qml">UmbrageStyles/Styles.qml</file>
-
-        <file alias="UmbrageUtils/qmldir">UmbrageUtils/qmldir</file>
-        <file alias="UmbrageUtils/Utils.qml">UmbrageUtils/Utils.qml</file>
+        <file alias="UmbrageKit">UmbrageKit</file>
+        <file alias="Components">Components</file>
+        <file alias="Pages">Pages</file>
+        <file alias="UmbrageStyles">UmbrageStyles</file>
+        <file alias="UmbrageUtils">UmbrageUtils</file>
     </qresource>
 </RCC>
