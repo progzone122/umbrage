@@ -1,4 +1,5 @@
 module Pages
+
 StepPage 1.0 StepPage.qml
 SetupPage 1.0 SetupPage.qml
 WaitConnectionPage 1.0 WaitConnectionPage.qml
