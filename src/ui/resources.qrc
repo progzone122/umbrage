@@ -4,14 +4,33 @@
     </qresource>
 
     <qresource prefix="/assets">
-        <file>Assets</file>
+        <file alias="auth_icon.svg">Assets/auth_icon.svg</file>
+        <file alias="da_icon.svg">Assets/da_icon.svg</file>
+        <file alias="device-icon.svg">Assets/device-icon.svg</file>
+        <file alias="disconnect-icon.svg">Assets/disconnect-icon.svg</file>
+        <file alias="docs_icon.svg">Assets/docs_icon.svg</file>
+        <file alias="ok-icon.svg">Assets/ok-icon.svg</file>
+        <file alias="preloader_icon.svg">Assets/preloader_icon.svg</file>
+        <file alias="progress_icon.svg">Assets/progress_icon.svg</file>
+        <file alias="template-icon.svg">Assets/template-icon.svg</file>
+        <file alias="terminal_icon.svg">Assets/terminal_icon.svg</file>
+        <file alias="umbrage-icon.svg">Assets/umbrage-icon.svg</file>
+        <file alias="umbrage-icon2.svg">Assets/umbrage-icon2.svg</file>
+        <file alias="usb_connected.svg">Assets/usb_connected.svg</file>
+        <file alias="vendor-icon.svg">Assets/vendor-icon.svg</file>
+        <file alias="choose-dir-icon.svg">Assets/choose-dir-icon.svg</file>
+        <file alias="flash-icon.svg">Assets/flash-icon.svg</file>
+        <file alias="search-icon.svg">Assets/search-icon.svg</file>
+        <file alias="collapse-icon.svg">Assets/collapse-icon.svg</file>
+        <file alias="more-icon.svg">Assets/more-icon.svg</file>
+        <file alias="trash-icon.svg">Assets/trash-icon.svg</file>
     </qresource>
 
     <qresource prefix="/qml">
-        <file alias="UmbrageKit">UmbrageKit</file>
-        <file alias="Components">Components</file>
-        <file alias="Pages">Pages</file>
-        <file alias="UmbrageStyles">UmbrageStyles</file>
-        <file alias="UmbrageUtils">UmbrageUtils</file>
+        <file>UmbrageKit</file>
+        <file>Components</file>
+        <file>Pages</file>
+        <file>UmbrageStyles</file>
+        <file>UmbrageUtils</file>
     </qresource>
 </RCC>
