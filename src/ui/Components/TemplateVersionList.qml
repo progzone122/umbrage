@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import UmbrageStyles 1.0
+import UmbrageKit 1.0
 
 // Scrollable, selectable list of versions.
 // The caller supplies `versions` as an array of { name, description, da, auth, preloader, default }

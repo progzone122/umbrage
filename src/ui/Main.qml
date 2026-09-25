@@ -9,6 +9,7 @@ import umbrage
 import Pages 1.0
 import UmbrageStyles 1.0
 import Components 1.0
+import UmbrageKit 1.0
 
 ApplicationWindow {
     id: root

@@ -4,6 +4,7 @@ import QtQuick.Layouts
 import umbrage
 import UmbrageStyles 1.0
 import Components 1.0
+import UmbrageKit 1.0
 
 RowLayout {
     id: root
