@@ -1,0 +1,10 @@
+module UmbrageKit
+
+UBadge 1.0 UBadge.qml
+UButton 1.0 UButton.qml
+UCheckRow 1.0 UCheckRow.qml
+UChooserField 1.0 UChooserField.qml
+UInput 1.0 UInput.qml
+UInputField 1.0 UInputField.qml
+UPopupMenu 1.0 UPopupMenu.qml
+UText 1.0 UText.qml

@@ -5,6 +5,7 @@ import umbrage
 import UmbrageStyles 1.0
 import UmbrageUtils 1.0
 import Components 1.0
+import UmbrageKit 1.0
 
 Rectangle {
     id: root
