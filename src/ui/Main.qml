@@ -46,86 +46,6 @@ ApplicationWindow {
         root.setPage(AppState.need_setup ? root.pageSetup : root.pageWaitConn);
     }
 
-    property var steps: [
-        {
-            title: "Hi! It`s Umbrage!",
-            text: "Before we begin, would you like to use a user repository to retrieve the templates, or would you prefer to specify your own files?",
-            image: "qrc:/assets/umbrage-icon2.svg",
-            buttons: [
-                {
-                    text: "Use Templates",
-                    outline: false,
-                    onClicked: function () {
-                        root.setPage(root.pageTemplates);
-                    }
-                },
-                {
-                    text: "Choose Manually",
-                    outline: true,
-                    onClicked: function (page) {
-                        page.goNext();
-                    }
-                }
-            ]
-        },
-        {
-            title: "Download Agent",
-            text: "Select the DA file to be used during interactions with the device.",
-            image: "qrc:/assets/da_icon.svg",
-            buttons: [
-                {
-                    text: "Choose file",
-                    outline: false,
-                    onClicked: function (page) {
-                        page.chooseFile();
-                    }
-                }
-            ]
-        },
-        {
-            title: "Auth File",
-            text: "Select the auth file if DAA is enabled in device.",
-            image: "qrc:/assets/auth_icon.svg",
-            buttons: [
-                {
-                    text: "Choose file",
-                    outline: false,
-                    onClicked: function (page) {
-                        page.chooseFile();
-                    }
-                },
-                {
-                    text: "Skip",
-                    outline: true,
-                    onClicked: function (page) {
-                        page.skip();
-                    }
-                }
-            ]
-        },
-        {
-            title: "Preloader File",
-            text: "Do you have a preloader dump from your device?\nIt can be used for certain exploits.",
-            image: "qrc:/assets/preloader_icon.svg",
-            buttons: [
-                {
-                    text: "Choose file",
-                    outline: false,
-                    onClicked: function (page) {
-                        page.chooseFile();
-                    }
-                },
-                {
-                    text: "Skip",
-                    outline: true,
-                    onClicked: function (page) {
-                        page.skip();
-                    }
-                }
-            ]
-        },
-    ]
-
     ColumnLayout {
         anchors.fill: parent
 
@@ -134,7 +54,7 @@ ApplicationWindow {
             function onPageChanged() {
                 if (AppState.page === root.pageSteps) {
                     stack.clear();
-                    stack.push(setupComponent);
+                    stack.push(stepsPageComponent);
                 } else if (AppState.page === root.pageWaitConn && AppState.skip_conn_page) {
                     root.setPage(root.pageMain);
                 }
@@ -156,7 +76,7 @@ ApplicationWindow {
                 id: stack
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                Component.onCompleted: stack.push(setupComponent)
+                Component.onCompleted: stack.push(stepsPageComponent)
             }
 
             WaitConnectionPage {}
@@ -175,44 +95,10 @@ ApplicationWindow {
     }
 
     Component {
-        id: setupComponent
-
-        ColumnLayout {
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-
-            StackView {
-                id: stepStack
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-                Component.onCompleted: pushStep(0)
-
-                function pushStep(step) {
-                    var page = stepPageComponent.createObject(stepStack, {
-                        step: step,
-                        stepTitle: root.steps[step].title,
-                        stepText: root.steps[step].text,
-                        stepImage: root.steps[step].image,
-                        isLastStep: step === root.steps.length - 1
-                    });
-
-                    page.buttons = root.steps[step].buttons;
-                    page.nextRequested.connect(function (nextStep) {
-                        stepStack.pushStep(nextStep);
-                    });
-                    page.backRequested.connect(stepStack.pop);
-                    page.finishedRequested.connect(function () {
-                        root.continueToDevice();
-                    });
-
-                    push(page);
-                }
-            }
+        id: stepsPageComponent
+        StepsPage {
+            onFinished: root.continueToDevice()
+            onGoTemplates: root.setPage(root.pageTemplates)
         }
-    }
-
-    Component {
-        id: stepPageComponent
-        StepPage {}
     }
 }

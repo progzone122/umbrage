@@ -2,8 +2,6 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import Qt.labs.platform
-import umbrage
-import Components 1.0
 import UmbrageKit 1.0
 
 Page {
@@ -19,7 +17,7 @@ Page {
     // On the last step goNext() emits finishedRequested() instead.
     property bool isLastStep: false
 
-    // Buttons supplied by the caller (Main.qml), as { text, onClicked }.
+    // Buttons supplied as { text, onClicked }.
     property var buttons: []
 
     signal nextRequested(int nextStep)
