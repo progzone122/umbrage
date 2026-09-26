@@ -1,0 +1,5 @@
+module Panels
+
+ExportTemplatePanel 1.0 ExportTemplatePanel.qml
+ExportTemplateVersionPanel 1.0 ExportTemplateVersionPanel.qml
+OperationPanel 1.0 OperationPanel.qml

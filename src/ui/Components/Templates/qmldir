@@ -1,0 +1,4 @@
+module Templates
+
+TemplateItem 1.0 TemplateItem.qml
+TemplateVersionList 1.0 TemplateVersionList.qml

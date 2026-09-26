@@ -1,0 +1,5 @@
+module Navigation
+
+MainMenu 1.0 MainMenu.qml
+MenuButton 1.0 MenuButton.qml
+TopPanel 1.0 TopPanel.qml
