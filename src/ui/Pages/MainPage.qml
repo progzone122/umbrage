@@ -256,6 +256,31 @@ Page {
                     text: "Write partitions"
                 },
                 {
+                    key: "reboot_to_normal",
+                    section: "reboot",
+                    text: "Normal mode"
+                },
+                {
+                    key: "reboot_to_home_screen",
+                    section: "reboot",
+                    text: "Home Screen mode"
+                },
+                {
+                    key: "reboot_to_fastboot",
+                    section: "reboot",
+                    text: "Fastboot mode"
+                },
+                {
+                    key: "reboot_to_meta",
+                    section: "reboot",
+                    text: "Meta mode"
+                },
+                {
+                    key: "reboot_to_test",
+                    section: "reboot",
+                    text: "Test mode"
+                },
+                {
                     key: "export_template",
                     section: "other",
                     text: "Template generator"
