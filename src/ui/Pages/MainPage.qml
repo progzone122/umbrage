@@ -301,6 +301,23 @@ Page {
                         page.populateFromSelectedTemplate();
                     page.currentOperation = key;
                 }
+
+                if (key == "reboot_to_normal" || key == "reboot_to_home_screen" || key == "reboot_to_fastboot" || key == "reboot_to_meta" || key == "reboot_to_test") {
+                    var modes = {
+                        "reboot_to_normal": "Normal",
+                        "reboot_to_home_screen": "Home Screen",
+                        "reboot_to_fastboot": "Fastboot",
+                        "reboot_to_meta": "META",
+                        "reboot_to_test": "TEST"
+                    };
+
+                    confirmDialog.actionKey = key;
+                    confirmDialog.title = qsTr("Reboot to " + modes[key] + " mode?");
+                    confirmDialog.description = qsTr("The device will be FULLY REBOOTED to " + modes[key] + " mode and may stop responding to commands from Umbrage.");
+                    confirmDialog.confirmText = qsTr("Reboot");
+                    confirmDialog.logText = "Please confirm that you are aware of all the risks and that you really do wish to proceed.";
+                    confirmDialog.open();
+                }
             }
         }
 
