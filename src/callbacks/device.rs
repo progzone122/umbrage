@@ -39,6 +39,10 @@ pub(crate) enum DeviceCommand {
     RequestPartitions {
         invoker: QmlMethodInvoker,
     },
+    RebootToMode {
+        bootmode: penumbra_mtk::BootMode,
+        invoker: QmlMethodInvoker,
+    },
 }
 
 /// Spawns the device worker thread and returns the command sender. The worker
@@ -133,6 +137,18 @@ fn worker_loop(rx: Receiver<DeviceCommand>) {
                     invoke_method!(invoker, "partitionsLoaded", json.to_string());
                 } else {
                     invoke_method!(invoker, "partitionsLoaded", "[]".to_string());
+                }
+            }
+            DeviceCommand::RebootToMode { bootmode, invoker } => {
+                if let Some(dev) = device.as_mut() {
+                    reboot_to_mode_on_worker(dev, bootmode, &invoker);
+                } else {
+                    invoke_method!(
+                        invoker,
+                        "rebootToModeFinished",
+                        false,
+                        "No device connected".to_string()
+                    );
                 }
             }
         }
@@ -258,7 +274,7 @@ fn set_bootloader_lock_on_worker(
     let label = action.to_lowercase();
     let log = |msg: String| {
         invoke_method!(invoker, "appendLog", msg.clone());
-        invoke_method!(invoker, "bootloaderLockProgress", msg);
+        invoke_method!(invoker, "actionProgress", msg);
     };
 
     log(format!("[{action}] Acquiring device handle..."));
@@ -629,7 +645,6 @@ pub fn append_log(state: &mut AppState, message: String) {
 
 pub fn set_bootloader_lock(state: &mut AppState, unlock: bool) {
     if !state.connected {
-        state.bootloader_lock_progress("ERROR: No device connected".to_string());
         state.append_log("ERROR: No device connected".to_string());
         return;
     }
@@ -752,4 +767,72 @@ pub fn request_partitions(state: &mut AppState) {
     };
 
     let _ = tx.send(DeviceCommand::RequestPartitions { invoker });
+}
+
+fn reboot_to_mode_on_worker(
+    dev: &mut penumbra_mtk::Device<'static, PortType>,
+    bootmode: penumbra_mtk::BootMode,
+    invoker: &QmlMethodInvoker,
+) {
+    let log = |msg: String| {
+        invoke_method!(invoker, "appendLog", msg.clone());
+        invoke_method!(invoker, "actionProgress", msg);
+    };
+
+    let action = format!("Reboot to {:#?} mode", bootmode);
+
+    log(format!("[{action}] Acquiring device handle..."));
+    log(format!(
+        "[{action}] Device acquired: HW=0x{:04X}",
+        dev.devinfo().hw_code(),
+    ));
+
+    log(format!("[{action}] Preparing..."));
+
+    match dev.reboot(bootmode) {
+        Ok(()) => {
+            log(format!("[{action}] Device rebooted successfully."));
+            log(
+                "[NOTE] The device is now rebooting and may stop responding to commands."
+                    .to_string(),
+            );
+            invoke_method!(
+                invoker,
+                "rebootToModeFinished",
+                true,
+                format!("Device rebooted to {bootmode:?} mode.")
+            );
+        }
+        Err(e) => {
+            let msg = format!(
+                "Failed to reboot the device to {bootmode:?} mode: {e}. The device may not support this operation."
+            );
+            log(format!("[{action}] ERROR: {msg}"));
+            invoke_method!(invoker, "rebootToModeFinished", false, msg);
+        }
+    }
+}
+
+pub fn reboot_to_mode(state: &mut AppState, bootmode: penumbra_mtk::BootMode) {
+    if !state.connected {
+        state.append_log("ERROR: No device connected".to_string());
+        return;
+    }
+
+    let invoker = state.get_qml_method_invoker();
+
+    let tx = match state.device_tx.lock().unwrap().as_ref() {
+        Some(tx) => tx.clone(),
+        None => {
+            invoke_method!(
+                invoker,
+                "rebootToModeFinished",
+                false,
+                "No device connection available".to_string()
+            );
+            return;
+        }
+    };
+
+    let _ = tx.send(DeviceCommand::RebootToMode { bootmode, invoker });
 }

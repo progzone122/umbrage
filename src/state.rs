@@ -193,10 +193,13 @@ impl AppState {
     pub(crate) fn export_finished(&mut self, success: bool, message: String);
 
     #[qsignal]
-    pub(crate) fn bootloader_lock_progress(&mut self, message: String);
+    pub(crate) fn bootloader_lock_finished(&mut self, success: bool, message: String);
 
     #[qsignal]
-    pub(crate) fn bootloader_lock_finished(&mut self, success: bool, message: String);
+    pub(crate) fn action_progress(&mut self, message: String);
+
+    #[qsignal]
+    pub(crate) fn reboot_to_mode_finished(&mut self, success: bool, message: String);
 
     #[qsignal]
     pub(crate) fn partition_progress(&mut self, message: String, percent: i32);
@@ -350,6 +353,20 @@ impl AppState {
     #[qslot]
     fn setup_install_finished(&mut self, success: bool, message: String) {
         callbacks::setup::install_finished(self, success, message);
+    }
+
+    #[qslot]
+    fn reboot_to_mode(&mut self, mode: String) {
+        let mode = match mode.as_str() {
+            "normal" => penumbra_mtk::BootMode::Normal,
+            "home_screen" => penumbra_mtk::BootMode::HomeScreen,
+            "fastboot" => penumbra_mtk::BootMode::Fastboot,
+            "test" => penumbra_mtk::BootMode::Test,
+            "meta" => penumbra_mtk::BootMode::Meta,
+            _ => panic!("unknown boot mode: {mode}"),
+        };
+
+        callbacks::device::reboot_to_mode(self, mode);
     }
 }
 

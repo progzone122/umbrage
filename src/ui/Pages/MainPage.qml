@@ -465,24 +465,61 @@ Page {
 
         onConfirmed: {
             confirmDialog.busy = true;
-            confirmDialog.logText += "\n" + (actionKey === "unlock" ? "Unlocking bootloader…" : "Locking bootloader…");
+
             if (actionKey === "unlock") {
+                confirmDialog.logText += "\nUnlocking bootloader…";
                 AppState.unlockBootloader();
-            } else {
+            }
+
+            if (actionKey === "lock") {
+                confirmDialog.logText += "\nLocking bootloader…";
                 AppState.lockBootloader();
+            }
+
+            if (actionKey === "reboot_to_normal") {
+                confirmDialog.logText += "\nReboot to normal mode…";
+                AppState.rebootToMode("normal");
+            }
+
+            if (actionKey === "reboot_to_home_screen") {
+                confirmDialog.logText += "\nReboot to home screen mode…";
+                AppState.rebootToMode("home_screen");
+            }
+
+            if (actionKey === "reboot_to_fastboot") {
+                confirmDialog.logText += "\nReboot to fastboot mode…";
+                AppState.rebootToMode("fastboot");
+            }
+
+            if (actionKey === "reboot_to_meta") {
+                confirmDialog.logText += "\nReboot to META mode…";
+                AppState.rebootToMode("meta");
+            }
+
+            if (actionKey === "reboot_to_test") {
+                confirmDialog.logText += "\nReboot to TEST mode…";
+                AppState.rebootToMode("test");
             }
         }
 
         // Stream operation progress into the dialog's log panel.
         Connections {
             target: AppState
-            function onBootloaderLockProgress(message) {
+            function onActionProgress(message) {
                 confirmDialog.logText += "\n" + message;
             }
             function onBootloaderLockFinished(success, message) {
                 confirmDialog.busy = false;
                 if (success) {
                     confirmDialog.logText += "\n" + qsTr("Done. Reboot the device to apply changes.");
+                } else {
+                    confirmDialog.logText += "\n" + qsTr("Operation failed: ") + message;
+                }
+            }
+            function onRebootToModeFinished(success, message) {
+                confirmDialog.busy = false;
+                if (success) {
+                    confirmDialog.logText += "\n" + qsTr("Done. The device is rebooting.");
                 } else {
                     confirmDialog.logText += "\n" + qsTr("Operation failed: ") + message;
                 }
