@@ -14,6 +14,7 @@ Item {
     property bool bootloaderExpanded: false
     property bool flashingExpanded: false
     property bool otherExpanded: false
+    property bool rebootingExpanded: false
 
     // `key` matches an entry in the caller-provided `actions`.
     signal actionRequested(string key)
@@ -82,6 +83,23 @@ Item {
 
                         Repeater {
                             model: root.actionsForSection("flashing")
+
+                            delegate: MenuButton {
+                                text: modelData.text
+                                onClicked: root.actionRequested(modelData.key)
+                            }
+                        }
+                    }
+
+                    CollapsibleSection {
+                        Layout.fillWidth: true
+
+                        title: "Reboot to mode"
+                        expanded: root.rebootingExpanded
+                        onToggleRequested: root.rebootingExpanded = !root.rebootingExpanded
+
+                        Repeater {
+                            model: root.actionsForSection("reboot")
 
                             delegate: MenuButton {
                                 text: modelData.text
