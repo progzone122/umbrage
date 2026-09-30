@@ -15,6 +15,7 @@ services:
     # build_appimage.py only targets x86_64; it rejects aarch64. Force amd64
     # so it also works on Apple Silicon through emulation.
     platform: linux/amd64
+    pull_policy: build
     working_dir: /src
     volumes:
       - .:/src
@@ -25,6 +26,7 @@ services:
     build:
       context: .
       dockerfile: scripts/Dockerfile.windows
+    pull_policy: build
     working_dir: /src
     volumes:
       - .:/src
