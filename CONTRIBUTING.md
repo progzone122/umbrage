@@ -20,6 +20,15 @@ Linux users who want a single runnable file instead of installing Qt can build a
 python3 scripts/build_appimage.py
 ```
 
+To build in a container on an older distro (better glibc compatibility) and
+skip the host prerequisites:
+
+```
+docker compose run --rm appimage [build_appimage.py flags...]
+```
+
+See `scripts/Dockerfile.appimage` and `compose.yaml`.
+
 The script needs `cargo`, `patchelf`, `strip`, `rsvg-convert`, and `curl` (or `wget`) on PATH.
 It downloads pinned copies of `linuxdeploy`, its Qt plugin, and `appimagetool` into `~/.cache/umbrage-cross`, builds the release binary, assembles an AppDir, bundles Qt and its plugins, and writes `dist/Umbrage-0.1.0-x86_64.AppImage`.
 
