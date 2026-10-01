@@ -14,8 +14,7 @@ services:
     build:
       context: .
       dockerfile: scripts/Dockerfile.appimage
-    # build_appimage.py only targets x86_64; it rejects aarch64. Force amd64
-    # so it runs on Apple Silicon through emulation.
+    # build_appimage.py only targets x86_64; it rejects aarch64. Force amd64.
     platform: linux/amd64
     pull_policy: build
     working_dir: /src
@@ -30,6 +29,8 @@ services:
     build:
       context: .
       dockerfile: scripts/Dockerfile.windows
+    # cargo-xwin targets x86_64-pc-windows-msvc; force amd64.
+    platform: linux/amd64
     pull_policy: build
     working_dir: /src
     volumes:

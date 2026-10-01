@@ -25,18 +25,24 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         mingw-w64 \
     && rm -rf /var/lib/apt/lists/*
 
-# penumbra-mtk needs nightly Rust (acon uses const_trait_impl).
+# Debian ships the MSVC-compatible driver as clang, not clang-cl. cargo-xwin
+# expects clang-cl, so link it. clang reads the driver mode from argv[0].
+RUN ln -s /usr/bin/clang /usr/local/bin/clang-cl
+
+# penumbra-mtk needs nightly Rust (acon uses const_trait_impl). cargo-xwin
+# builds on stable; its version here needs Rust >= 1.89.
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs \
     | sh -s -- -y --default-toolchain nightly --profile minimal \
     && /root/.cargo/bin/rustup target add x86_64-pc-windows-msvc
 
 # cargo-xwin supplies the MSVC headers and import libs, and links with
 # lld-link. mingw-w64 covers the few crates that expect a GNU toolchain.
-ENV PATH="/root/.cargo/bin:${PATH}"
+ENV PATH="/root/.cargo/bin:${PATH}" \
+    RUSTUP_TOOLCHAIN=nightly
 
 WORKDIR /src
 
-ENV CARGO_XWIN_VERSION=0.16.0
+ENV CARGO_XWIN_VERSION=0.23.1
 RUN cargo install cargo-xwin --version "${CARGO_XWIN_VERSION}" --locked
 
 ENTRYPOINT ["python3", "scripts/build_windows.py"]
