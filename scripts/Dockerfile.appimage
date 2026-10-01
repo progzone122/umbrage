@@ -31,6 +31,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         libudev-dev \
         libusb-1.0-0-dev \
         libxkbcommon-dev \
+        libwayland-cursor0 \
         libegl1 \
         libgl1 \
         libfontconfig1 \
