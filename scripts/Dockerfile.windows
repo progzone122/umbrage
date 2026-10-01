@@ -13,6 +13,9 @@ FROM ubuntu:24.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 
+# The STL that xwin ships needs Clang 19+. Ubuntu 24.04 defaults the clang
+# metapackage to 18, so pin the 19 packages and link the unversioned names
+# cargo-xwin looks for.
 RUN apt-get update && apt-get install -y --no-install-recommends \
         ca-certificates \
         curl \
@@ -21,18 +24,17 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         python3 \
         python3-venv \
         python3-pip \
-        clang \
-        lld \
-        llvm \
+        clang-19 \
+        lld-19 \
+        llvm-19 \
         git \
         mingw-w64 \
         nsis \
-    && rm -rf /var/lib/apt/lists/*
-
-# Ubuntu ships lld-link and llvm-lib from the llvm package, but not the
-# clang-cl alias. cargo-xwin expects clang-cl; clang reads the driver mode
-# from argv[0], so a symlink is enough.
-RUN ln -s /usr/bin/clang /usr/local/bin/clang-cl
+    && rm -rf /var/lib/apt/lists/* \
+    && ln -s /usr/bin/clang-19 /usr/local/bin/clang-cl \
+    && ln -s /usr/bin/lld-link-19 /usr/local/bin/lld-link \
+    && ln -s /usr/bin/llvm-lib-19 /usr/local/bin/llvm-lib \
+    && ln -s /usr/bin/llvm-rc-19 /usr/local/bin/llvm-rc
 
 # penumbra-mtk needs nightly Rust (acon uses const_trait_impl). cargo-xwin
 # builds on stable; its version here needs Rust >= 1.89.
