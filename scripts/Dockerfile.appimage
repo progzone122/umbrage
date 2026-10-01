@@ -74,6 +74,7 @@ ENV QT_VERSION=${QT_VERSION}
 # libudev and libusb link penumbra-mtk's libusb feature. The aqt Qt bin dir
 # goes on PATH so build_appimage.py finds qmake there.
 ENV PATH="/root/.cargo/bin:/opt/Qt/${QT_VERSION}/gcc_64/bin:${PATH}" \
+    LD_LIBRARY_PATH="/opt/Qt/${QT_VERSION}/gcc_64/lib" \
     QMAKE=/opt/Qt/${QT_VERSION}/gcc_64/bin/qmake \
     RCC=/opt/Qt/${QT_VERSION}/gcc_64/libexec/rcc
 
