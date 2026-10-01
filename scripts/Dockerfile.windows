@@ -1,7 +1,7 @@
 # Cross-compile Umbrage for Windows (x86_64-pc-windows-msvc) inside a container.
 #
 # Same prerequisites as CROSSCOMPILE.md: cargo-xwin (MSVC toolchain), LLVM
-# (clang-cl + lld-link), NSIS (makensis), and aqtinstall.
+# (clang-cl + lld-link + llvm-lib), NSIS (makensis), and aqtinstall.
 #
 # Usage:
 #   docker compose run --rm windows [build_windows.py flags...]
@@ -9,11 +9,13 @@
 # aqtinstall pulls about 1 GB of Qt (target and host) on first run. Mount the
 # cache volume so it survives.
 
-FROM debian:bookworm-slim
+FROM ubuntu:24.04
+
+ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-        curl \
         ca-certificates \
+        curl \
         build-essential \
         pkg-config \
         python3 \
@@ -21,12 +23,15 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         python3-pip \
         clang \
         lld \
+        llvm \
         git \
         mingw-w64 \
+        nsis \
     && rm -rf /var/lib/apt/lists/*
 
-# Debian ships the MSVC-compatible driver as clang, not clang-cl. cargo-xwin
-# expects clang-cl, so link it. clang reads the driver mode from argv[0].
+# Ubuntu ships lld-link and llvm-lib from the llvm package, but not the
+# clang-cl alias. cargo-xwin expects clang-cl; clang reads the driver mode
+# from argv[0], so a symlink is enough.
 RUN ln -s /usr/bin/clang /usr/local/bin/clang-cl
 
 # penumbra-mtk needs nightly Rust (acon uses const_trait_impl). cargo-xwin
