@@ -1,13 +1,13 @@
 # Cross-compile Umbrage for Windows (x86_64-pc-windows-msvc) inside a container.
 #
-# Matches the host prerequisites from CROSSCOMPILE.md: cargo-xwin (MSVC
-# toolchain), LLVM (clang-cl + lld-link), NSIS (makensis), and aqtinstall.
+# Same prerequisites as CROSSCOMPILE.md: cargo-xwin (MSVC toolchain), LLVM
+# (clang-cl + lld-link), NSIS (makensis), and aqtinstall.
 #
 # Usage:
 #   docker compose run --rm windows [build_windows.py flags...]
 #
-# aqtinstall pulls roughly 1 GB of Qt (target and host) on first run. Mount
-# the cache volume so it survives.
+# aqtinstall pulls about 1 GB of Qt (target and host) on first run. Mount the
+# cache volume so it survives.
 
 FROM debian:bookworm-slim
 
@@ -25,9 +25,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         mingw-w64 \
     && rm -rf /var/lib/apt/lists/*
 
+# penumbra-mtk needs nightly Rust (acon uses const_trait_impl).
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs \
+    | sh -s -- -y --default-toolchain nightly --profile minimal \
+    && /root/.cargo/bin/rustup target add x86_64-pc-windows-msvc
+
 # cargo-xwin supplies the MSVC headers and import libs, and links with
 # lld-link. mingw-w64 covers the few crates that expect a GNU toolchain.
-RUN rustup target add x86_64-pc-windows-msvc
+ENV PATH="/root/.cargo/bin:${PATH}"
 
 WORKDIR /src
 

@@ -1,14 +1,19 @@
 # Build Umbrage as a Linux AppImage inside a container.
 #
-# Ubuntu 22.04 keeps the glibc floor at 2.35 so the AppImage runs on older
-# distros too. A rolling-release host would want a newer glibc.
+# Ubuntu 22.04 caps glibc at 2.35, so the AppImage runs on older distros.
+# A rolling-release host would want a newer glibc.
+#
+# The distro ships Qt 6.2.4, too old for this project (it needs 6.10+:
+# QSpan, QMetaMethod::nameView, QQmlApplicationEngine::loadFromModule).
+# aqtinstall installs Qt into /opt/Qt instead.
 #
 # Usage:
 #   docker compose run --rm appimage [build_appimage.py flags...]
 
 FROM ubuntu:22.04
 
-ENV DEBIAN_FRONTEND=noninteractive
+ENV DEBIAN_FRONTEND=noninteractive \
+    LANG=C.UTF-8
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
         ca-certificates \
@@ -20,10 +25,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         python3 \
         python3-pip \
         python3-venv \
-        qt6-base-dev \
-        qt6-base-private-dev \
-        qt6-declarative-dev \
-        qt6-declarative-private-dev \
         patchelf \
         binutils \
         librsvg2-bin \
@@ -34,11 +35,21 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         libgl1 \
         libfontconfig1 \
         libdbus-1-3 \
+        libglib2.0-0 \
         libxcb-cursor0 \
         libxcb-icccm4 \
         libxcb-keysyms1 \
         libxcb-shape0 \
         libxcb-xkb1 \
+        libxcb-render-util0 \
+        libxcb-image0 \
+        libxcb-shm0 \
+        libxcb-xinerama0 \
+        libxcb-randr0 \
+        libxcb-sync1 \
+        libxcb-xfixes0 \
+        libxcb-render0 \
+        libxkbcommon-x11-0 \
     && rm -rf /var/lib/apt/lists/*
 
 # penumbra-mtk needs nightly Rust (acon uses const_trait_impl).
@@ -46,10 +57,25 @@ RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs \
     | sh -s -- -y --default-toolchain nightly --profile minimal \
     && /root/.cargo/bin/rustup target add x86_64-unknown-linux-gnu
 
-# libudev and libusb link penumbra-mtk's libusb feature.
-ENV PATH="/root/.cargo/bin:${PATH}" \
-    QMAKE=/usr/bin/qmake6 \
-    RCC=/usr/lib/qt6/libexec/rcc
+# aqtinstall puts Qt under /opt/Qt.
+ARG QT_VERSION=6.10.3
+# aqt lays the kit out flat under gcc_64, not linux_gcc_64.
+RUN python3 -m venv /opt/aqt-venv \
+    && /opt/aqt-venv/bin/pip install -q aqtinstall \
+    && /opt/aqt-venv/bin/aqt install-qt linux desktop "${QT_VERSION}" \
+        linux_gcc_64 -O /opt/Qt \
+    # aqt puts qtpaths in bin/, but qtbridge's qt-build-utils looks for it in
+    # libexec/ (QT_INSTALL_LIBEXECS). Link it so the probe succeeds.
+    && ln -s ../bin/qtpaths /opt/Qt/${QT_VERSION}/gcc_64/libexec/qtpaths
+
+# Keep the version out of the ARG scope so the ENV values below can use it.
+ENV QT_VERSION=${QT_VERSION}
+
+# libudev and libusb link penumbra-mtk's libusb feature. The aqt Qt bin dir
+# goes on PATH so build_appimage.py finds qmake there.
+ENV PATH="/root/.cargo/bin:/opt/Qt/${QT_VERSION}/gcc_64/bin:${PATH}" \
+    QMAKE=/opt/Qt/${QT_VERSION}/gcc_64/bin/qmake \
+    RCC=/opt/Qt/${QT_VERSION}/gcc_64/libexec/rcc
 
 WORKDIR /src
 

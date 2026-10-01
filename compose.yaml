@@ -4,8 +4,10 @@
 #   docker compose run --rm windows  [build_windows.py  flags...]
 #
 # The project root mounts at /src. Artifacts land in ./dist and ./target.
-# Two named volumes cache the cargo registry and the Qt/tool downloads so
-# rebuilds are fast.
+# Named volumes cache the cargo registry, the build target, and the Qt/tool
+# downloads. Do not mount over /root/.cargo: it holds rustup and the toolchain
+# from the image. An empty volume there would hide them and break the cargo
+# symlinks.
 
 services:
   appimage:
@@ -13,13 +15,15 @@ services:
       context: .
       dockerfile: scripts/Dockerfile.appimage
     # build_appimage.py only targets x86_64; it rejects aarch64. Force amd64
-    # so it also works on Apple Silicon through emulation.
+    # so it runs on Apple Silicon through emulation.
     platform: linux/amd64
     pull_policy: build
     working_dir: /src
     volumes:
       - .:/src
-      - umbrage-cargo:/root/.cargo
+      - umbrage-cargo-registry:/root/.cargo/registry
+      - umbrage-cargo-git:/root/.cargo/git
+      - umbrage-target:/src/target
       - umbrage-cache:/root/.cache/umbrage-cross
 
   windows:
@@ -30,9 +34,13 @@ services:
     working_dir: /src
     volumes:
       - .:/src
-      - umbrage-cargo:/root/.cargo
+      - umbrage-cargo-registry:/root/.cargo/registry
+      - umbrage-cargo-git:/root/.cargo/git
+      - umbrage-target:/src/target
       - umbrage-cache:/root/.cache/umbrage-cross
 
 volumes:
-  umbrage-cargo:
+  umbrage-cargo-registry:
+  umbrage-cargo-git:
+  umbrage-target:
   umbrage-cache:
