@@ -27,6 +27,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         python3-venv \
         patchelf \
         binutils \
+        file \
         librsvg2-bin \
         libudev-dev \
         libusb-1.0-0-dev \
