@@ -11,34 +11,13 @@ concurrency:
 
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      # aqtinstall 3.3.0 cannot resolve Qt 6.11 on Windows (the repo moved
-      # to a flattened msvc layout), so stay on 6.10.3 -- the same version
-      # the release pipeline uses.
-      - name: Install Qt
-        uses: jurplel/install-qt-action@v4
-        with:
-          version: "6.10.3"
-          arch: win64_msvc2022_64
-          cache: true
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
-      # penumbra-mtk -> acon requires nightly Rust (const_trait_impl).
-      - name: Install Rust toolchain
-        uses: dtolnay/rust-toolchain@nightly
-        with:
-          toolchain: nightly
-
-      - name: Cache cargo registry and target
-        uses: Swatinem/rust-cache@v2
-        with:
-          workspaces: . -> target
-
-      - name: Build
-        shell: pwsh
+      - name: Build the Windows target in a container
         run: |
-          $env:QMAKE = "$env:QT_ROOT_DIR\bin\qmake.exe"
-          $env:RCC = "$env:QT_ROOT_DIR\bin\rcc.exe"
-          cargo build --release
+          docker compose run --rm windows
