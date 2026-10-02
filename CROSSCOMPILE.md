@@ -8,6 +8,15 @@ Windows releases are built from macOS or Linux with [cargo-xwin](https://github.
 python3 scripts/build_windows.py
 ```
 
+You can also build in a Docker container and skip installing the host
+prerequisites:
+
+```sh
+docker compose run --rm windows [build_windows.py flags...]
+```
+
+See `scripts/Dockerfile.windows` and `compose.yaml` for what the image installs.
+
 Output:
 
 - `target/x86_64-pc-windows-msvc/release/umbrage.exe`

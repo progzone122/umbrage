@@ -1,0 +1,64 @@
+# Cross-compile Umbrage for Windows (x86_64-pc-windows-msvc) inside a container.
+#
+# Same prerequisites as CROSSCOMPILE.md: cargo-xwin (MSVC toolchain), LLVM
+# (clang-cl + lld-link + llvm-lib), NSIS (makensis), and aqtinstall.
+#
+# Usage:
+#   docker compose run --rm windows [build_windows.py flags...]
+#
+# aqtinstall pulls about 1 GB of Qt (target and host) on first run. Mount the
+# cache volume so it survives.
+
+FROM ubuntu:24.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+# xwin's STL needs Clang 19+. Ubuntu 24.04 pins the clang metapackage to 18,
+# so install the 19 packages and link the unversioned names cargo-xwin wants.
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        ca-certificates \
+        curl \
+        build-essential \
+        pkg-config \
+        python3 \
+        python3-venv \
+        python3-pip \
+        clang-19 \
+        lld-19 \
+        llvm-19 \
+        git \
+        mingw-w64 \
+        nsis \
+        libglib2.0-0 \
+        libfontconfig1 \
+        libdbus-1-3 \
+        libxkbcommon0 \
+        libegl1 \
+        libgl1 \
+        libxcb-cursor0 \
+        libxcb-icccm4 \
+        libxcb-keysyms1 \
+        libxcb-xkb1 \
+    && rm -rf /var/lib/apt/lists/* \
+    && ln -s /usr/bin/clang-19 /usr/local/bin/clang-cl \
+    && ln -s /usr/bin/lld-link-19 /usr/local/bin/lld-link \
+    && ln -s /usr/bin/llvm-lib-19 /usr/local/bin/llvm-lib \
+    && ln -s /usr/bin/llvm-rc-19 /usr/local/bin/llvm-rc
+
+# penumbra-mtk needs nightly Rust (acon uses const_trait_impl). cargo-xwin
+# builds on stable; its version here needs Rust >= 1.89.
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs \
+    | sh -s -- -y --default-toolchain nightly --profile minimal \
+    && /root/.cargo/bin/rustup target add x86_64-pc-windows-msvc
+
+# cargo-xwin supplies the MSVC headers and import libs, and links with
+# lld-link. mingw-w64 covers the few crates that expect a GNU toolchain.
+ENV PATH="/root/.cargo/bin:${PATH}" \
+    RUSTUP_TOOLCHAIN=nightly
+
+WORKDIR /src
+
+ENV CARGO_XWIN_VERSION=0.23.1
+RUN cargo install cargo-xwin --version "${CARGO_XWIN_VERSION}" --locked
+
+ENTRYPOINT ["python3", "scripts/build_windows.py"]

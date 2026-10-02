@@ -27,8 +27,12 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 TARGET = "x86_64-pc-windows-msvc"
 QT_VERSION = "6.10.3"
+# aqt names the arch differently from the dir it creates (e.g. linux_gcc_64
+# lands in gcc_64). _ARCH feeds aqt; _DIRNAME is the on-disk path.
 WIN_QT_ARCH = "win64_msvc2022_64"
 WIN_QT_DIRNAME = "msvc2022_64"
+HOST_QT_ARCH = "linux_gcc_64"
+HOST_QT_DIRNAME = "gcc_64"
 CACHE_DIR = Path.home() / ".cache" / "umbrage-cross"
 DIST_DIR = PROJECT_ROOT / "dist"
 PAYLOAD_DIR = DIST_DIR / "umbrage-windows"
@@ -108,10 +112,10 @@ def aqt_command() -> list[str]:
     return [str(aqt_bin)]
 
 
-def ensure_qt(qt_root: Path, host_arch: str) -> tuple[Path, Path]:
+def ensure_qt(qt_root: Path) -> tuple[Path, Path]:
     """Returns (windows_qt_dir, host_qt_dir)."""
     win_qt = qt_root / QT_VERSION / WIN_QT_DIRNAME
-    host_qt = qt_root / QT_VERSION / host_arch
+    host_qt = qt_root / QT_VERSION / HOST_QT_DIRNAME
     aqt = aqt_command()
 
     if not (win_qt / "lib" / "Qt6Core.prl").exists():
@@ -135,7 +139,7 @@ def ensure_qt(qt_root: Path, host_arch: str) -> tuple[Path, Path]:
         not (host_qt / "libexec" / "rcc").exists()
         and not (host_qt / "bin" / "rcc").exists()
     ):
-        log(f"Installing host Qt {QT_VERSION} ({host_arch}) -> {host_qt}")
+        log(f"Installing host Qt {QT_VERSION} ({HOST_QT_ARCH}) -> {host_qt}")
         run(
             aqt
             + [
@@ -143,7 +147,7 @@ def ensure_qt(qt_root: Path, host_arch: str) -> tuple[Path, Path]:
                 aqt_platform(),
                 "desktop",
                 QT_VERSION,
-                host_arch,
+                HOST_QT_ARCH,
                 "-O",
                 str(qt_root),
             ]
@@ -227,7 +231,9 @@ def write_shims(shim_dir: Path, win_qt: Path, host_tools: Path) -> Path:
     return qmake
 
 
-def cargo_build(win_qt: Path, host_tools: Path, qmake: Path, clean: bool) -> Path:
+def cargo_build(
+    win_qt: Path, host_qt: Path, host_tools: Path, qmake: Path, clean: bool
+) -> Path:
     llvm_bin = find_llvm_bin()
     find_lld_link()
 
@@ -235,6 +241,14 @@ def cargo_build(win_qt: Path, host_tools: Path, qmake: Path, clean: bool) -> Pat
     env["PATH"] = f"{llvm_bin}:{env.get('PATH', '')}"
     env["QMAKE"] = str(qmake)
     env["RCC"] = str(host_tools / "rcc")
+    # The host rcc loads libQt6Core.so.6 and friends from the host Qt lib dir.
+    # Linux needs LD_LIBRARY_PATH for that; macOS resolves them via rpath.
+    host_lib = str(host_qt / "lib")
+    env["LD_LIBRARY_PATH"] = (
+        host_lib + ":" + env["LD_LIBRARY_PATH"]
+        if env.get("LD_LIBRARY_PATH")
+        else host_lib
+    )
 
     if clean:
         log("cargo clean (windows target)")
@@ -371,12 +385,11 @@ def main() -> int:
 
     ensure_cargo_xwin()
 
-    host_arch = "macos" if platform.system() == "Darwin" else "gcc_64"
-    win_qt, host_qt = ensure_qt(args.qt_root, host_arch)
+    win_qt, host_qt = ensure_qt(args.qt_root)
     host_tools = host_tool_dir(host_qt)
     qmake = write_shims(CACHE_DIR / "shims", win_qt, host_tools)
 
-    exe = cargo_build(win_qt, host_tools, qmake, args.clean)
+    exe = cargo_build(win_qt, host_qt, host_tools, qmake, args.clean)
 
     if args.skip_payload and args.skip_installer:
         return 0

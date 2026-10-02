@@ -1,0 +1,47 @@
+# Docker Compose definitions for building Umbrage release artifacts.
+#
+#   docker compose run --rm appimage [build_appimage.py flags...]
+#   docker compose run --rm windows  [build_windows.py  flags...]
+#
+# The project root mounts at /src. Artifacts land in ./dist and ./target.
+# Named volumes cache the cargo registry, the build target, and the Qt/tool
+# downloads. Do not mount over /root/.cargo: it holds rustup and the toolchain
+# from the image. An empty volume there would hide them and break the cargo
+# symlinks.
+
+services:
+  appimage:
+    build:
+      context: .
+      dockerfile: scripts/Dockerfile.appimage
+    # build_appimage.py only targets x86_64; it rejects aarch64. Force amd64.
+    platform: linux/amd64
+    pull_policy: build
+    working_dir: /src
+    volumes:
+      - .:/src
+      - umbrage-cargo-registry:/root/.cargo/registry
+      - umbrage-cargo-git:/root/.cargo/git
+      - umbrage-target:/src/target
+      - umbrage-cache:/root/.cache/umbrage-cross
+
+  windows:
+    build:
+      context: .
+      dockerfile: scripts/Dockerfile.windows
+    # cargo-xwin targets x86_64-pc-windows-msvc; force amd64.
+    platform: linux/amd64
+    pull_policy: build
+    working_dir: /src
+    volumes:
+      - .:/src
+      - umbrage-cargo-registry:/root/.cargo/registry
+      - umbrage-cargo-git:/root/.cargo/git
+      - umbrage-target:/src/target
+      - umbrage-cache:/root/.cache/umbrage-cross
+
+volumes:
+  umbrage-cargo-registry:
+  umbrage-cargo-git:
+  umbrage-target:
+  umbrage-cache:
