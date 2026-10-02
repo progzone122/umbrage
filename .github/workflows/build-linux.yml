@@ -1,12 +1,13 @@
 name: Build (Linux)
 
 on:
-  pull_request:
-    branches: [main, master]
+  push:
+    tags:
+      - '*'
   workflow_dispatch:
 
 concurrency:
-  group: build-linux-${{ github.head_ref || github.ref }}
+  group: build-linux-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -21,3 +22,10 @@ jobs:
       - name: Build the AppImage in a container
         run: |
           docker compose run --rm appimage
+
+      - name: Attach to release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/Umbrage-*.AppImage
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -1,12 +1,13 @@
 name: Build (Windows)
 
 on:
-  pull_request:
-    branches: [main, master]
+  push:
+    tags:
+      - '*'
   workflow_dispatch:
 
 concurrency:
-  group: build-windows-${{ github.head_ref || github.ref }}
+  group: build-windows-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -21,3 +22,12 @@ jobs:
       - name: Build the Windows target in a container
         run: |
           docker compose run --rm windows
+
+      - name: Attach to release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/umbrage-setup.exe
+            dist/umbrage-windows/**/*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

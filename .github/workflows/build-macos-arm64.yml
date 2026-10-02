@@ -1,12 +1,13 @@
 name: Build (macOS ARM64)
 
 on:
-  pull_request:
-    branches: [main, master]
+  push:
+    tags:
+      - '*'
   workflow_dispatch:
 
 concurrency:
-  group: build-macos-arm64-${{ github.head_ref || github.ref }}
+  group: build-macos-arm64-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -40,3 +41,10 @@ jobs:
         env:
           QMAKE: ${{ env.QT_ROOT_DIR }}/bin/qmake
           RCC: ${{ env.QT_ROOT_DIR }}/libexec/rcc
+
+      - name: Attach to release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: target/aarch64-apple-darwin/release/umbrage
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
