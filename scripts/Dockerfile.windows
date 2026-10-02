@@ -13,9 +13,8 @@ FROM ubuntu:24.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-# The STL that xwin ships needs Clang 19+. Ubuntu 24.04 defaults the clang
-# metapackage to 18, so pin the 19 packages and link the unversioned names
-# cargo-xwin looks for.
+# xwin's STL needs Clang 19+. Ubuntu 24.04 pins the clang metapackage to 18,
+# so install the 19 packages and link the unversioned names cargo-xwin wants.
 RUN apt-get update && apt-get install -y --no-install-recommends \
         ca-certificates \
         curl \
@@ -30,6 +29,16 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         git \
         mingw-w64 \
         nsis \
+        libglib2.0-0 \
+        libfontconfig1 \
+        libdbus-1-3 \
+        libxkbcommon0 \
+        libegl1 \
+        libgl1 \
+        libxcb-cursor0 \
+        libxcb-icccm4 \
+        libxcb-keysyms1 \
+        libxcb-xkb1 \
     && rm -rf /var/lib/apt/lists/* \
     && ln -s /usr/bin/clang-19 /usr/local/bin/clang-cl \
     && ln -s /usr/bin/lld-link-19 /usr/local/bin/lld-link \

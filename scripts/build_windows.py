@@ -231,7 +231,9 @@ def write_shims(shim_dir: Path, win_qt: Path, host_tools: Path) -> Path:
     return qmake
 
 
-def cargo_build(win_qt: Path, host_tools: Path, qmake: Path, clean: bool) -> Path:
+def cargo_build(
+    win_qt: Path, host_qt: Path, host_tools: Path, qmake: Path, clean: bool
+) -> Path:
     llvm_bin = find_llvm_bin()
     find_lld_link()
 
@@ -239,6 +241,14 @@ def cargo_build(win_qt: Path, host_tools: Path, qmake: Path, clean: bool) -> Pat
     env["PATH"] = f"{llvm_bin}:{env.get('PATH', '')}"
     env["QMAKE"] = str(qmake)
     env["RCC"] = str(host_tools / "rcc")
+    # The host rcc loads libQt6Core.so.6 and friends from the host Qt lib dir.
+    # Linux needs LD_LIBRARY_PATH for that; macOS resolves them via rpath.
+    host_lib = str(host_qt / "lib")
+    env["LD_LIBRARY_PATH"] = (
+        host_lib + ":" + env["LD_LIBRARY_PATH"]
+        if env.get("LD_LIBRARY_PATH")
+        else host_lib
+    )
 
     if clean:
         log("cargo clean (windows target)")
@@ -379,7 +389,7 @@ def main() -> int:
     host_tools = host_tool_dir(host_qt)
     qmake = write_shims(CACHE_DIR / "shims", win_qt, host_tools)
 
-    exe = cargo_build(win_qt, host_tools, qmake, args.clean)
+    exe = cargo_build(win_qt, host_qt, host_tools, qmake, args.clean)
 
     if args.skip_payload and args.skip_installer:
         return 0
