@@ -12,6 +12,9 @@ concurrency:
   group: build-macos-arm64-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: macos-latest
