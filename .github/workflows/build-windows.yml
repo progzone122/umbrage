@@ -1,9 +1,9 @@
 name: Build (Windows)
 
 on:
-  push:
-    tags:
-      - '*'
+  # push:
+  #   tags:
+  #     - '*'
   pull_request:
     branches: [main, master]
   workflow_dispatch:
@@ -12,8 +12,8 @@ concurrency:
   group: build-windows-${{ github.ref }}
   cancel-in-progress: true
 
-permissions:
-  contents: write
+# permissions:
+#   contents: write
 
 jobs:
   build:
