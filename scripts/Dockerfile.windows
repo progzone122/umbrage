@@ -34,7 +34,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         libdbus-1-3 \
         libxkbcommon0 \
         libegl1 \
+        libegl-mesa0 \
         libgl1 \
+        libgl-dev \
         libxcb-cursor0 \
         libxcb-icccm4 \
         libxcb-keysyms1 \

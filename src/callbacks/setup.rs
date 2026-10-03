@@ -1,4 +1,4 @@
-use qtbridge::{QObjectHolder, invoke_method};
+use qtbridge::{QmlObject, invoke_method};
 
 use crate::platform;
 use crate::state::AppState;

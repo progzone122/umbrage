@@ -1,7 +1,7 @@
 use std::sync::atomic::{AtomicI64, Ordering};
 use std::sync::mpsc::{self, Receiver, Sender};
 
-use qtbridge::{QObjectHolder, QmlMethodInvoker, invoke_method};
+use qtbridge::{QmlMethodInvoker, QmlObject, invoke_method};
 
 use penumbra_mtk::hacc::LockState;
 use penumbra_mtk::port::{MtkPort, PortBackend, PortType};
