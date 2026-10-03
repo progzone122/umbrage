@@ -54,8 +54,7 @@ Page {
 
     Connections {
         target: AppState
-        function onPartitionsLoaded(json) {
-            var list = JSON.parse(json);
+        function onPartitionsLoaded(list) {
             var entries = [];
             for (var i = 0; i < list.length; ++i) {
                 entries.push({
@@ -74,8 +73,8 @@ Page {
             }
         }
         // Scatter file parsed. Apply its mapping to the partition table.
-        function onScatterFileLoaded(json) {
-            page.applyScatterMapping(JSON.parse(json));
+        function onScatterFileLoaded(entries) {
+            page.applyScatterMapping(entries);
         }
         function onScatterFileFailed(message) {
             scatterErrorDialog.logText = message;
@@ -160,7 +159,7 @@ Page {
         if (AppState.selected_codename === "")
             return;
 
-        var repo = JSON.parse(AppState.repo);
+        var repo = AppState.repo;
         var device = repo.devices[AppState.selected_codename];
         if (device === undefined)
             return;
@@ -556,9 +555,9 @@ Page {
             }
 
             if (isRead) {
-                AppState.readPartitions(JSON.stringify(selected), page.outputDirectory);
+                AppState.readPartitions(selected, page.outputDirectory);
             } else {
-                AppState.writePartitions(JSON.stringify(selected));
+                AppState.writePartitions(selected);
             }
         }
 

@@ -47,7 +47,7 @@ Item {
         exportDialog.open();
     }
 
-    // Shapes the panel data into the JSON payload Rust expects for export.
+    // Shapes the panel data into the payload Rust expects for export.
     function buildExportPayload() {
         var list = [];
         for (var i = 0; i < root.versions.length; i++) {
@@ -63,12 +63,12 @@ Item {
                 }
             });
         }
-        return JSON.stringify({
+        return {
             vendor: root.vendor ? root.vendor : "",
             model: root.model ? root.model : "",
             codename: root.codename ? root.codename : "",
             versions: list
-        });
+        };
     }
 
     // A local path is sent as-is; a repo entry is sent as { name, sha256 } so

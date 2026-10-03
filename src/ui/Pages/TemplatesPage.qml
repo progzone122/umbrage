@@ -95,7 +95,7 @@ Page {
     function onRepoReady() {
         if (page.loading === false)
             return;
-        page.repo = JSON.parse(AppState.repo);
+        page.repo = AppState.repo;
         page.repoLoaded = true;
         finishLoading();
     }
@@ -227,7 +227,7 @@ Page {
         page.filesPending = true;
         page.downloadProgress = -1;
         page.downloadText = "";
-        AppState.downloadTemplateFiles(JSON.stringify(files));
+        AppState.downloadTemplateFiles(files);
     }
 
     function onItemSelected(item, step) {

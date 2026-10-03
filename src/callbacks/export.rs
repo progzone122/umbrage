@@ -5,17 +5,17 @@ use crate::templates::export::{ExportPayload, build_yaml};
 
 /// Runs the export on a worker thread so hashing large DA files doesn't freeze
 /// the UI, then reports the result back to QML.
-pub fn export_template(state: &mut AppState, payload_json: String, dest: String) {
+pub fn export_template(state: &mut AppState, payload: serde_json::Value, dest: String) {
     let invoker = state.get_qml_method_invoker();
 
-    std::thread::spawn(move || match build_export(&payload_json, &dest) {
+    std::thread::spawn(move || match build_export(payload, &dest) {
         Ok(path) => invoke_method!(invoker, "exportResult", true, path),
         Err(message) => invoke_method!(invoker, "exportResult", false, message),
     });
 }
 
-fn build_export(payload_json: &str, dest: &str) -> Result<String, String> {
-    let payload: ExportPayload = serde_json::from_str(payload_json)
+fn build_export(payload: serde_json::Value, dest: &str) -> Result<String, String> {
+    let payload: ExportPayload = serde_json::from_value(payload)
         .map_err(|e| format!("Failed to parse export payload: {e}"))?;
 
     let yaml = build_yaml(&payload)?;

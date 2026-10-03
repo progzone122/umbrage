@@ -8,7 +8,7 @@ authors = ["DiabloSat <dev@diablosat.cc>"]
 repository = "https://github.com/progzone122/umbrage"
 
 [dependencies]
-qtbridge = {version = "0.3.0", features = ["linkme"]}
+qtbridge = {version = "0.3.0", features = ["linkme", "serde_json"]}
 cxx = "1.0"
 reqwest = { version = "0.13.4", features = ["json"] }
 serde = { version = "1.0.229", features = ["derive"] }
