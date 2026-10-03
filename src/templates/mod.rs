@@ -32,7 +32,7 @@ pub async fn wait_cancelled(cancel: &AtomicBool) {
     }
 }
 
-pub async fn fetch_meta_json() -> Result<String, String> {
+pub async fn fetch_meta_json() -> Result<serde_json::Value, String> {
     let body = http_client()?
         .get(format!("{ENDPOINT}/meta.json"))
         .send()
@@ -44,12 +44,16 @@ pub async fn fetch_meta_json() -> Result<String, String> {
         .await
         .map_err(|e| format!("Failed to read meta.json body: {e}"))?;
 
+    let value: serde_json::Value =
+        serde_json::from_str(&body).map_err(|e| format!("Invalid meta.json: {e}"))?;
+
     // Reject bad metadata before it reaches QML. Parsing into `Meta` instead
     // of a bare `serde_json::Value` also catches a missing field or wrong shape
     // early.
-    serde_json::from_str::<model::Meta>(&body).map_err(|e| format!("Invalid meta.json: {e}"))?;
+    serde_json::from_value::<model::Meta>(value.clone())
+        .map_err(|e| format!("Invalid meta.json: {e}"))?;
 
-    Ok(body)
+    Ok(value)
 }
 
 pub async fn download_file(

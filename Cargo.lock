@@ -1666,6 +1666,7 @@ dependencies = [
  "linkme",
  "qtbridge-build-utils",
  "qtbridge-type-lib",
+ "serde_json",
 ]
 
 [[package]]

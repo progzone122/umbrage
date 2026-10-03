@@ -26,7 +26,7 @@ pub struct AppState {
     pub(crate) auth_file: String,
     pub(crate) preloader_file: String,
     pub(crate) logs: Vec<String>,
-    pub(crate) repo: String,
+    pub(crate) repo: serde_json::Value,
     pub(crate) connected: bool,
     pub(crate) connecting: bool,
     pub(crate) chip_name: String,
@@ -211,10 +211,10 @@ impl AppState {
     pub(crate) fn partition_finished(&mut self, success: bool, message: String);
 
     #[qsignal]
-    pub(crate) fn partitions_loaded(&mut self, partitions_json: String);
+    pub(crate) fn partitions_loaded(&mut self, partitions: Vec<serde_json::Value>);
 
     #[qsignal]
-    pub(crate) fn scatter_file_loaded(&mut self, scatter_json: String);
+    pub(crate) fn scatter_file_loaded(&mut self, entries: Vec<serde_json::Value>);
 
     #[qsignal]
     pub(crate) fn scatter_file_failed(&mut self, message: String);
@@ -225,8 +225,8 @@ impl AppState {
     }
 
     #[qslot]
-    fn templates_ready(&mut self, json: String) {
-        callbacks::templates::templates_ready(self, json);
+    fn templates_ready(&mut self, repo: serde_json::Value) {
+        callbacks::templates::templates_ready(self, repo);
     }
 
     #[qslot]
@@ -255,8 +255,8 @@ impl AppState {
     }
 
     #[qslot]
-    fn download_template_files(&mut self, files_json: String) {
-        callbacks::templates::download_template_files(self, files_json);
+    fn download_template_files(&mut self, files: serde_json::Value) {
+        callbacks::templates::download_template_files(self, files);
     }
 
     #[qslot]
@@ -265,13 +265,13 @@ impl AppState {
     }
 
     #[qslot]
-    fn template_download_failed(&mut self, files_json: String) {
-        callbacks::templates::template_download_failed(self, files_json);
+    fn template_download_failed(&mut self) {
+        callbacks::templates::template_download_failed(self);
     }
 
     #[qslot]
-    fn export_template(&mut self, payload_json: String, dest: String) {
-        callbacks::export::export_template(self, payload_json, dest);
+    fn export_template(&mut self, payload: serde_json::Value, dest: String) {
+        callbacks::export::export_template(self, payload, dest);
     }
 
     #[qslot]
@@ -316,13 +316,13 @@ impl AppState {
     }
 
     #[qslot]
-    fn read_partitions(&mut self, partitions_json: String, directory: String) {
-        callbacks::device::read_partitions(self, partitions_json, directory);
+    fn read_partitions(&mut self, partitions: serde_json::Value, directory: String) {
+        callbacks::device::read_partitions(self, partitions, directory);
     }
 
     #[qslot]
-    fn write_partitions(&mut self, partitions_json: String) {
-        callbacks::device::write_partitions(self, partitions_json);
+    fn write_partitions(&mut self, partitions: serde_json::Value) {
+        callbacks::device::write_partitions(self, partitions);
     }
 
     #[qslot]
@@ -379,7 +379,7 @@ impl Default for AppState {
             page: Page::Steps as u8,
             skip_conn_page: env::args().any(|arg| arg == "--skip-conn"),
             logs: Vec::new(),
-            repo: String::new(),
+            repo: serde_json::Value::Null,
             connected: false,
             connecting: false,
             chip_name: String::new(),

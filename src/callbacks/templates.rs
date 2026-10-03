@@ -49,8 +49,8 @@ pub fn cancel_loading(state: &mut AppState) {
     state.templates_cancel.store(true, Ordering::SeqCst);
 }
 
-pub fn templates_ready(state: &mut AppState, json: String) {
-    state.repo = json;
+pub fn templates_ready(state: &mut AppState, repo: serde_json::Value) {
+    state.repo = repo;
     state.repo_changed();
 }
 
@@ -76,8 +76,8 @@ pub fn template_download_progress(state: &mut AppState, message: String, percent
     state.template_progress(message, percent);
 }
 
-pub fn download_template_files(state: &mut AppState, files_json: String) {
-    let files: TemplateFile = match serde_json::from_str(&files_json) {
+pub fn download_template_files(state: &mut AppState, files: serde_json::Value) {
+    let files: TemplateFile = match serde_json::from_value(files) {
         Ok(f) => f,
         Err(e) => {
             state.append_log(format!("ERROR: Failed to parse template files: {e}"));
@@ -102,7 +102,7 @@ pub fn download_template_files(state: &mut AppState, files_json: String) {
                     "appendLog",
                     format!("ERROR: Failed to start the network runtime: {e}")
                 );
-                invoke_method!(invoker, "templateDownloadFailed", files_json);
+                invoke_method!(invoker, "templateDownloadFailed");
                 return;
             }
         };
@@ -146,7 +146,7 @@ pub fn download_template_files(state: &mut AppState, files_json: String) {
             }
             Err(e) => {
                 invoke_method!(invoker, "appendLog", format!("ERROR: {e}"));
-                invoke_method!(invoker, "templateDownloadFailed", files_json);
+                invoke_method!(invoker, "templateDownloadFailed");
                 return;
             }
         };
@@ -184,6 +184,6 @@ pub fn apply_downloaded_files(state: &mut AppState, da: String, auth: String, pr
     state.template_files_ready();
 }
 
-pub fn template_download_failed(state: &mut AppState, _files_json: String) {
+pub fn template_download_failed(state: &mut AppState) {
     state.template_files_failed();
 }

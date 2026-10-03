@@ -97,8 +97,12 @@ pub fn load_scatter_file(state: &mut AppState, path: String) {
         })
         .collect();
 
-    match serde_json::to_string(&entries) {
-        Ok(json) => state.scatter_file_loaded(json),
+    match entries
+        .iter()
+        .map(serde_json::to_value)
+        .collect::<Result<Vec<serde_json::Value>, _>>()
+    {
+        Ok(entries) => state.scatter_file_loaded(entries),
         Err(e) => state.scatter_file_failed(format!("Failed to encode scatter file: {e}")),
     }
 }

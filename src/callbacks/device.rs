@@ -103,7 +103,11 @@ fn worker_loop(rx: Receiver<DeviceCommand>) {
                         progress_invokers,
                     );
                 } else {
-                    invoke_method!(log_invoker, "partitionsLoaded", "[]".to_string());
+                    invoke_method!(
+                        log_invoker,
+                        "partitionsLoaded",
+                        Vec::<serde_json::Value>::new()
+                    );
                 }
             }
             DeviceCommand::WritePartitions {
@@ -125,7 +129,7 @@ fn worker_loop(rx: Receiver<DeviceCommand>) {
             DeviceCommand::RequestPartitions { invoker } => {
                 if let Some(dev) = device.as_mut() {
                     let partitions = dev.partitions();
-                    let json: serde_json::Value = partitions
+                    let entries: Vec<serde_json::Value> = partitions
                         .iter()
                         .map(|p| {
                             serde_json::json!({
@@ -134,9 +138,9 @@ fn worker_loop(rx: Receiver<DeviceCommand>) {
                             })
                         })
                         .collect();
-                    invoke_method!(invoker, "partitionsLoaded", json.to_string());
+                    invoke_method!(invoker, "partitionsLoaded", entries);
                 } else {
-                    invoke_method!(invoker, "partitionsLoaded", "[]".to_string());
+                    invoke_method!(invoker, "partitionsLoaded", Vec::<serde_json::Value>::new());
                 }
             }
             DeviceCommand::RebootToMode { bootmode, invoker } => {
@@ -667,8 +671,8 @@ pub fn set_bootloader_lock(state: &mut AppState, unlock: bool) {
     let _ = tx.send(DeviceCommand::SetBootloaderLock { unlock, invoker });
 }
 
-pub fn read_partitions(state: &mut AppState, partitions_json: String, directory: String) {
-    let targets: Vec<PartitionTarget> = match serde_json::from_str(&partitions_json) {
+pub fn read_partitions(state: &mut AppState, partitions: serde_json::Value, directory: String) {
+    let targets: Vec<PartitionTarget> = match serde_json::from_value(partitions) {
         Ok(t) => t,
         Err(e) => {
             state.partition_progress(format!("ERROR: Failed to parse partitions: {e}"), -1);
@@ -710,8 +714,8 @@ pub fn read_partitions(state: &mut AppState, partitions_json: String, directory:
     });
 }
 
-pub fn write_partitions(state: &mut AppState, partitions_json: String) {
-    let targets: Vec<PartitionTarget> = match serde_json::from_str(&partitions_json) {
+pub fn write_partitions(state: &mut AppState, partitions: serde_json::Value) {
+    let targets: Vec<PartitionTarget> = match serde_json::from_value(partitions) {
         Ok(t) => t,
         Err(e) => {
             state.partition_progress(format!("ERROR: Failed to parse partitions: {e}"), -1);
@@ -752,7 +756,7 @@ pub fn write_partitions(state: &mut AppState, partitions_json: String) {
 
 pub fn request_partitions(state: &mut AppState) {
     if !state.connected {
-        state.partitions_loaded("[]".to_string());
+        state.partitions_loaded(Vec::new());
         return;
     }
 
@@ -761,7 +765,7 @@ pub fn request_partitions(state: &mut AppState) {
     let tx = match state.device_tx.lock().unwrap().as_ref() {
         Some(tx) => tx.clone(),
         None => {
-            invoke_method!(invoker, "partitionsLoaded", "[]".to_string());
+            invoke_method!(invoker, "partitionsLoaded", Vec::<serde_json::Value>::new());
             return;
         }
     };
