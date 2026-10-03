@@ -6,7 +6,7 @@ use crate::callbacks::device::format_size;
 use crate::logs;
 use crate::state::AppState;
 
-use qtbridge::{QObjectHolder, invoke_method};
+use qtbridge::{QmlObject, invoke_method};
 
 use crate::templates::model::TemplateFile;
 use crate::templates::{CANCELLED, fetch_meta_json, resolve_template_files, wait_cancelled};

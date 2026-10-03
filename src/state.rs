@@ -3,7 +3,7 @@ use std::sync::atomic::AtomicBool;
 use std::sync::mpsc::Sender;
 use std::sync::{Arc, Mutex};
 
-use qtbridge::{qobject, qsignal};
+use qtbridge::qobject;
 
 use crate::callbacks;
 use crate::callbacks::device::DeviceCommand;
