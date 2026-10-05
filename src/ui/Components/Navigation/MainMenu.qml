@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import umbrage
+import UmbrageKit 1.0
 import UmbrageStyles 1.0
 import Components 1.0
 
@@ -10,8 +11,6 @@ Item {
 
     Layout.fillHeight: true
     Layout.preferredWidth: 280
-
-    property string activeSlot: ""
 
     property bool bootloaderExpanded: false
     property bool flashingExpanded: false
@@ -176,21 +175,19 @@ Item {
                     }
                 }
 
-                Button {
+                UButton {
                     Layout.preferredWidth: 42
                     Layout.preferredHeight: 48
 
-                    display: Button.IconOnly
+                    iconDisplay: Button.TextBesideIcon
 
                     icon.source: "qrc:/assets/disconnect-icon.svg"
                     icon.color: Styles.surfaceForeground
                     icon.width: 20
                     icon.height: 20
 
-                    background: Rectangle {
-                        radius: Styles.radiusMedium
-                        color: Styles.surfaceHigh
-                    }
+                    text: AppState.active_slot
+                    backgroundColor: Styles.surfaceHigh
 
                     onClicked: {
                         AppState.disconnectDevice();
