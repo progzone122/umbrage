@@ -3,7 +3,7 @@ use std::sync::mpsc::{self, Receiver, Sender};
 
 use qtbridge::{QmlMethodInvoker, QmlObject, invoke_method};
 
-use penumbra_mtk::hacc::LockState;
+use penumbra_mtk::hacc::{BootPartition, IntoBytes, LockState, OFFSET_SLOT_SUFFIX};
 use penumbra_mtk::port::{MtkPort, PortBackend, PortType};
 
 use crate::logs;
@@ -41,6 +41,13 @@ pub(crate) enum DeviceCommand {
     },
     RebootToMode {
         bootmode: penumbra_mtk::BootMode,
+        invoker: QmlMethodInvoker,
+    },
+    RequestGetActiveSlot {
+        invoker: QmlMethodInvoker,
+    },
+    RequestSetActiveSlot {
+        slot: BootPartition,
         invoker: QmlMethodInvoker,
     },
 }
@@ -150,6 +157,31 @@ fn worker_loop(rx: Receiver<DeviceCommand>) {
                     invoke_method!(
                         invoker,
                         "rebootToModeFinished",
+                        false,
+                        "No device connected".to_string()
+                    );
+                }
+            }
+            DeviceCommand::RequestGetActiveSlot { invoker } => {
+                let slot = match device.as_mut() {
+                    Some(dev) => dev
+                        .get_bootctrl()
+                        .ok()
+                        .map(|bootctrl| format!("{:?}", bootctrl.get_active_slot()))
+                        .unwrap_or_default(),
+
+                    None => String::new(),
+                };
+
+                invoke_method!(invoker, "activeSlotLoaded", slot);
+            }
+            DeviceCommand::RequestSetActiveSlot { slot, invoker } => {
+                if let Some(dev) = device.as_mut() {
+                    set_active_slot_on_worker(dev, slot, &invoker);
+                } else {
+                    invoke_method!(
+                        invoker,
+                        "slotSwitchFinished",
                         false,
                         "No device connected".to_string()
                     );
@@ -635,6 +667,9 @@ pub fn disconnect_device(state: &mut AppState) {
     state.connection_error.clear();
     state.connection_error_changed();
 
+    state.active_slot.clear();
+    state.active_slot_changed();
+
     logs::info(&mut state.logs, "Device disconnected");
     state.logs_changed();
 
@@ -839,4 +874,107 @@ pub fn reboot_to_mode(state: &mut AppState, bootmode: penumbra_mtk::BootMode) {
     };
 
     let _ = tx.send(DeviceCommand::RebootToMode { bootmode, invoker });
+}
+
+pub fn get_active_slot(state: &mut AppState) {
+    let invoker = state.get_qml_method_invoker();
+
+    let tx = { state.device_tx.lock().unwrap().clone() };
+    let Some(tx) = tx else {
+        state.active_slot_loaded(String::new());
+        return;
+    };
+
+    let _ = tx.send(DeviceCommand::RequestGetActiveSlot { invoker });
+}
+
+fn set_active_slot_on_worker(
+    dev: &mut penumbra_mtk::Device<'static, PortType>,
+    slot: BootPartition,
+    invoker: &QmlMethodInvoker,
+) {
+    let name = format!("{slot:?}");
+
+    let log = |msg: String| {
+        invoke_method!(invoker, "appendLog", msg.clone());
+        invoke_method!(invoker, "actionProgress", msg);
+    };
+
+    log("[Switch slot] Acquiring device handle...".to_string());
+
+    let mut bootctrl = match dev.get_bootctrl() {
+        Ok(b) => b,
+        Err(e) => {
+            let msg = format!(
+                "Failed to switch the active slot: {e}. The device may not support A/B slots."
+            );
+            log(format!("[Switch slot] ERROR: {msg}"));
+            invoke_method!(invoker, "slotSwitchFinished", false, msg);
+            return;
+        }
+    };
+
+    if bootctrl.get_active_slot() == slot {
+        log(format!("[Switch slot] Active slot is already {name}."));
+        invoke_method!(
+            invoker,
+            "slotSwitchFinished",
+            true,
+            format!("Active slot is already {name}.")
+        );
+        return;
+    }
+
+    bootctrl.set_active_slot(slot);
+
+    // Boot control sits at a fixed offset in misc.
+    let bytes = bootctrl.as_bytes();
+    let mut data = vec![0u8; OFFSET_SLOT_SUFFIX + bytes.len()];
+    data[OFFSET_SLOT_SUFFIX..].copy_from_slice(bytes);
+
+    if let Err(e) = dev.write_partition("misc", data.len(), &data[..], |_, _| {}) {
+        let msg = format!("Failed to write the boot control to 'misc': {e}.");
+        log(format!("[Switch slot] ERROR: {msg}"));
+        invoke_method!(invoker, "slotSwitchFinished", false, msg);
+        return;
+    }
+
+    // get_bootctrl() serves a cached copy, so store the slot we just wrote;
+    // otherwise the next toggle reads the old one and short-circuits above.
+    dev.devinfo().set_bootctrl(bootctrl);
+
+    log(format!("[Switch slot] Active slot set to {name}."));
+
+    // Update the badge before ending the dialog's wait.
+    invoke_method!(invoker, "activeSlotLoaded", name.clone());
+    invoke_method!(
+        invoker,
+        "slotSwitchFinished",
+        true,
+        format!("Active slot set to {name}.")
+    );
+}
+
+pub fn set_active_slot(state: &mut AppState, slot: BootPartition) {
+    if !state.connected {
+        state.append_log("ERROR: No device connected".to_string());
+        return;
+    }
+
+    let invoker = state.get_qml_method_invoker();
+
+    let tx = match state.device_tx.lock().unwrap().as_ref() {
+        Some(tx) => tx.clone(),
+        None => {
+            invoke_method!(
+                invoker,
+                "slotSwitchFinished",
+                false,
+                "No device connection available".to_string()
+            );
+            return;
+        }
+    };
+
+    let _ = tx.send(DeviceCommand::RequestSetActiveSlot { slot, invoker });
 }

@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import umbrage
+import UmbrageKit 1.0
 import UmbrageStyles 1.0
 import Components 1.0
 
@@ -18,6 +19,8 @@ Item {
 
     // `key` matches an entry in the caller-provided `actions`.
     signal actionRequested(string key)
+
+    signal slotSwitchRequested
 
     // Each entry: { key, section: "bootloader"|"flashing", text }
     property var actions: []
@@ -174,24 +177,42 @@ Item {
                     }
                 }
 
-                Button {
-                    Layout.preferredWidth: 42
-                    Layout.preferredHeight: 48
+                RowLayout {
 
-                    display: Button.IconOnly
+                    spacing: Styles.spacing
 
-                    icon.source: "qrc:/assets/disconnect-icon.svg"
-                    icon.color: Styles.surfaceForeground
-                    icon.width: 20
-                    icon.height: 20
+                    UButton {
+                        Layout.preferredWidth: 42
+                        Layout.preferredHeight: 48
+                        iconDisplay: Button.IconOnly
 
-                    background: Rectangle {
-                        radius: Styles.radiusMedium
-                        color: Styles.surfaceHigh
+                        visible: AppState.active_slot !== ""
+                        icon.source: AppState.active_slot === "A" ? "qrc:/assets/slot-a-icon.svg" : "qrc:/assets/slot-b-icon.svg"
+                        icon.color: Styles.surfaceForeground
+                        icon.width: 20
+                        icon.height: 20
+
+                        backgroundColor: Styles.surfaceHigh
+
+                        onClicked: root.slotSwitchRequested()
                     }
 
-                    onClicked: {
-                        AppState.disconnectDevice();
+                    UButton {
+                        Layout.preferredWidth: 42
+                        Layout.preferredHeight: 48
+
+                        iconDisplay: Button.IconOnly
+
+                        icon.source: "qrc:/assets/disconnect-icon.svg"
+                        icon.color: Styles.surfaceForeground
+                        icon.width: 20
+                        icon.height: 20
+
+                        backgroundColor: Styles.surfaceHigh
+
+                        onClicked: {
+                            AppState.disconnectDevice();
+                        }
                     }
                 }
             }

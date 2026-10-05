@@ -48,8 +48,10 @@ Page {
     // Fetch the real partition table when the page becomes visible with a
     // device connected.
     onVisibleChanged: {
-        if (page.visible && AppState.connected)
+        if (page.visible && AppState.connected) {
             AppState.requestPartitions();
+            AppState.requestGetActiveSlot();
+        }
     }
 
     Connections {
@@ -318,6 +320,17 @@ Page {
                     confirmDialog.open();
                 }
             }
+
+            onSlotSwitchRequested: {
+                var target = AppState.active_slot === "A" ? "B" : "A";
+                confirmDialog.actionKey = "switch_slots";
+                confirmDialog.pendingSlot = target;
+                confirmDialog.title = qsTr("Switch to slot " + target + "?");
+                confirmDialog.description = qsTr("The device will switch the active slot to " + target + "." + "\nBefore switching, make sure that the " + target + " slot contains a working preloader and an lk with the correct signature and version. Otherwise, the device may end up in a HARD BRICK state!");
+                confirmDialog.confirmText = qsTr("Switch");
+                confirmDialog.logText = "Please confirm that you are aware of all the risks and that you really do wish to proceed.";
+                confirmDialog.open();
+            }
         }
 
         ColumnLayout {
@@ -454,6 +467,7 @@ Page {
         id: confirmDialog
 
         property string actionKey: ""
+        property string pendingSlot: ""
 
         // No percentage is available for the seccfg write, so show a spinner.
         showSpinner: confirmDialog.busy
@@ -499,6 +513,11 @@ Page {
                 confirmDialog.logText += "\nReboot to TEST mode…";
                 AppState.rebootToMode("test");
             }
+
+            if (actionKey === "switch_slots") {
+                confirmDialog.logText += "\nSwitching active slot to " + confirmDialog.pendingSlot + "…";
+                AppState.requestSetActiveSlot(confirmDialog.pendingSlot);
+            }
         }
 
         // Stream operation progress into the dialog's log panel.
@@ -510,6 +529,7 @@ Page {
             function onBootloaderLockFinished(success, message) {
                 confirmDialog.busy = false;
                 if (success) {
+                    confirmDialog.confirmEnabled = false;
                     confirmDialog.logText += "\n" + qsTr("Done. Reboot the device to apply changes.");
                 } else {
                     confirmDialog.logText += "\n" + qsTr("Operation failed: ") + message;
@@ -518,7 +538,17 @@ Page {
             function onRebootToModeFinished(success, message) {
                 confirmDialog.busy = false;
                 if (success) {
+                    confirmDialog.confirmEnabled = false;
                     confirmDialog.logText += "\n" + qsTr("Done. The device is rebooting.");
+                } else {
+                    confirmDialog.logText += "\n" + qsTr("Operation failed: ") + message;
+                }
+            }
+            function onSlotSwitchFinished(success, message) {
+                confirmDialog.busy = false;
+                if (success) {
+                    confirmDialog.confirmEnabled = false;
+                    confirmDialog.logText += "\n" + qsTr("Done. The active slot has been switched to " + AppState.active_slot);
                 } else {
                     confirmDialog.logText += "\n" + qsTr("Operation failed: ") + message;
                 }
