@@ -186,7 +186,6 @@ Item {
                     icon.width: 20
                     icon.height: 20
 
-                    text: AppState.active_slot
                     backgroundColor: Styles.surfaceHigh
 
                     onClicked: {
