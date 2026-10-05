@@ -24,6 +24,8 @@
         <file alias="collapse-icon.svg">Assets/collapse-icon.svg</file>
         <file alias="more-icon.svg">Assets/more-icon.svg</file>
         <file alias="trash-icon.svg">Assets/trash-icon.svg</file>
+        <file alias="slot-a-icon.svg">Assets/slot-a-icon.svg</file>
+        <file alias="slot-b-icon.svg">Assets/slot-b-icon.svg</file>
     </qresource>
 
     <qresource prefix="/qml">
