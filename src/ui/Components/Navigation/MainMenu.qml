@@ -182,16 +182,19 @@ Item {
                     UButton {
                         Layout.preferredWidth: 42
                         Layout.preferredHeight: 48
-
                         iconDisplay: Button.IconOnly
 
-                        icon.source: "qrc:/assets/slot-a-icon.svg"
+                        visible: AppState.active_slot !== ""
+                        icon.source: AppState.active_slot === "A" ? "qrc:/assets/slot-a-icon.svg" : "qrc:/assets/slot-b-icon.svg"
                         icon.color: Styles.surfaceForeground
                         icon.width: 20
                         icon.height: 20
 
-                        text: AppState.active_slot
                         backgroundColor: Styles.surfaceHigh
+
+                        onClicked: {
+                            AppState.requestSetActiveSlot(AppState.active_slot === "A" ? "B" : "A");
+                        }
                     }
 
                     UButton {
