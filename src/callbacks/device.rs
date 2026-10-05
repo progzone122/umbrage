@@ -3,7 +3,7 @@ use std::sync::mpsc::{self, Receiver, Sender};
 
 use qtbridge::{QmlMethodInvoker, QmlObject, invoke_method};
 
-use penumbra_mtk::hacc::LockState;
+use penumbra_mtk::hacc::{BootPartition, LockState};
 use penumbra_mtk::port::{MtkPort, PortBackend, PortType};
 
 use crate::logs;
@@ -41,6 +41,9 @@ pub(crate) enum DeviceCommand {
     },
     RebootToMode {
         bootmode: penumbra_mtk::BootMode,
+        invoker: QmlMethodInvoker,
+    },
+    RequestGetActiveSlot {
         invoker: QmlMethodInvoker,
     },
 }
@@ -154,6 +157,19 @@ fn worker_loop(rx: Receiver<DeviceCommand>) {
                         "No device connected".to_string()
                     );
                 }
+            }
+            DeviceCommand::RequestGetActiveSlot { invoker } => {
+                let slot = match device.as_mut() {
+                    Some(dev) => dev
+                        .get_bootctrl()
+                        .ok()
+                        .map(|bootctrl| format!("{:?}", bootctrl.get_active_slot()))
+                        .unwrap_or_default(),
+
+                    None => String::new(),
+                };
+
+                invoke_method!(invoker, "activeSlotLoaded", slot);
             }
         }
     }
@@ -839,4 +855,16 @@ pub fn reboot_to_mode(state: &mut AppState, bootmode: penumbra_mtk::BootMode) {
     };
 
     let _ = tx.send(DeviceCommand::RebootToMode { bootmode, invoker });
+}
+
+pub fn get_active_slot(state: &mut AppState) {
+    let invoker = state.get_qml_method_invoker();
+
+    let tx = { state.device_tx.lock().unwrap().clone() };
+    let Some(tx) = tx else {
+        state.active_slot_loaded(String::new());
+        return;
+    };
+
+    let _ = tx.send(DeviceCommand::RequestGetActiveSlot { invoker });
 }

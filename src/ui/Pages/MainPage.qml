@@ -48,8 +48,10 @@ Page {
     // Fetch the real partition table when the page becomes visible with a
     // device connected.
     onVisibleChanged: {
-        if (page.visible && AppState.connected)
+        if (page.visible && AppState.connected) {
             AppState.requestPartitions();
+            AppState.requestGetActiveSlot();
+        }
     }
 
     Connections {

@@ -219,6 +219,9 @@ impl AppState {
     #[qsignal]
     pub(crate) fn scatter_file_failed(&mut self, message: String);
 
+    #[qsignal]
+    pub(crate) fn active_slot_loaded(&mut self, slot: String);
+
     #[qslot]
     fn request_get_templates(&mut self) {
         callbacks::templates::request_get_templates(self);
@@ -367,6 +370,11 @@ impl AppState {
         };
 
         callbacks::device::reboot_to_mode(self, mode);
+    }
+
+    #[qslot]
+    fn request_get_active_slot(&mut self) {
+        callbacks::device::get_active_slot(self);
     }
 }
 
