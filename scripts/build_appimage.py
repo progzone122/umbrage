@@ -32,10 +32,12 @@ import subprocess
 import sys
 from pathlib import Path
 
+from _app_meta import read_app_version
+
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 TARGET = "x86_64-unknown-linux-gnu"
 APP_NAME = "Umbrage"
-APP_VERSION = "0.1.2"
+APP_VERSION = read_app_version()
 CACHE_DIR = Path.home() / ".cache" / "umbrage-cross"
 TOOLS_DIR = CACHE_DIR / "appimage-tools"
 DIST_DIR = PROJECT_ROOT / "dist"
@@ -91,7 +93,9 @@ def run(cmd: list[str], **kwargs) -> None:
 
 def env_with_path(extra: list[Path]) -> dict[str, str]:
     env = os.environ.copy()
-    env["PATH"] = os.pathsep.join([str(p) for p in extra]) + os.pathsep + env.get("PATH", "")
+    env["PATH"] = (
+        os.pathsep.join([str(p) for p in extra]) + os.pathsep + env.get("PATH", "")
+    )
     return env
 
 
@@ -302,7 +306,9 @@ def ensure_qt_extra() -> None:
     qml_dest = APPDIR / "usr" / "qml"
     qt_conf = APPDIR / "usr" / "bin" / "qt.conf"
     if not qt_conf.exists():
-        qt_conf.write_text("[Paths]\nPrefix = ..\nPlugins = plugins\nQml2Imports = qml\n")
+        qt_conf.write_text(
+            "[Paths]\nPrefix = ..\nPlugins = plugins\nQml2Imports = qml\n"
+        )
 
     qml_src = qt_install_qml()
     for rel in ("QtQuick/Controls/Basic", "QtQuick/Controls/Fusion"):
@@ -387,7 +393,9 @@ def smoke_test() -> None:
     elif proc.returncode == 0:
         log("Smoke test finished: app exited cleanly")
     else:
-        die(f"app crashed during smoke test (exit code {proc.returncode}):\n{output[-2000:]}")
+        die(
+            f"app crashed during smoke test (exit code {proc.returncode}):\n{output[-2000:]}"
+        )
 
 
 def run_appimagetool(tools: Path) -> Path:
