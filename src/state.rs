@@ -209,6 +209,9 @@ impl AppState {
     pub(crate) fn reboot_to_mode_finished(&mut self, success: bool, message: String);
 
     #[qsignal]
+    pub(crate) fn slot_switch_finished(&mut self, success: bool, message: String);
+
+    #[qsignal]
     pub(crate) fn partition_progress(&mut self, message: String, percent: i32);
 
     #[qsignal]
@@ -382,6 +385,17 @@ impl AppState {
     #[qslot]
     fn request_get_active_slot(&mut self) {
         callbacks::device::get_active_slot(self);
+    }
+
+    #[qslot]
+    fn request_set_active_slot(&mut self, slot: String) {
+        let slot = match slot.as_str() {
+            "A" => penumbra_mtk::hacc::BootPartition::A,
+            "B" => penumbra_mtk::hacc::BootPartition::B,
+            _ => panic!("unknown boot slot: {slot}"),
+        };
+
+        callbacks::device::set_active_slot(self, slot);
     }
 
     #[qslot]

@@ -20,6 +20,8 @@ Item {
     // `key` matches an entry in the caller-provided `actions`.
     signal actionRequested(string key)
 
+    signal slotSwitchRequested
+
     // Each entry: { key, section: "bootloader"|"flashing", text }
     property var actions: []
 
@@ -192,9 +194,7 @@ Item {
 
                         backgroundColor: Styles.surfaceHigh
 
-                        onClicked: {
-                            AppState.requestSetActiveSlot(AppState.active_slot === "A" ? "B" : "A");
-                        }
+                        onClicked: root.slotSwitchRequested()
                     }
 
                     UButton {

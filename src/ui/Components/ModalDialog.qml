@@ -29,6 +29,9 @@ Popup {
     property bool showCancel: true
     property bool showConfirm: true
 
+    // Set false once an operation succeeds to block a second press; onOpened resets it.
+    property bool confirmEnabled: true
+
     // Progress in 0..1 range. Negative hides the bar.
     property real progress: -1
     property string progressText: ""
@@ -49,6 +52,8 @@ Popup {
     }
 
     focus: true
+
+    onOpened: root.confirmEnabled = true
 
     background: Rectangle {
         color: Styles.surface
@@ -202,7 +207,7 @@ Popup {
             UButton {
                 visible: root.showConfirm
                 text: root.confirmText
-                disabled: root.busy
+                disabled: root.busy || !root.confirmEnabled
 
                 onClicked: root.confirmed()
             }
