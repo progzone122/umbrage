@@ -1,4 +1,4 @@
-use std::sync::atomic::{AtomicI64, Ordering};
+use std::sync::atomic::{AtomicBool, AtomicI64, Ordering};
 use std::sync::mpsc::{self, Receiver, Sender};
 
 use qtbridge::{QmlMethodInvoker, QmlObject, invoke_method};
@@ -63,6 +63,37 @@ pub(crate) fn spawn_device_worker() -> Sender<DeviceCommand> {
     });
 
     tx
+}
+
+static WATCH_STARTED: AtomicBool = AtomicBool::new(false);
+const WATCH_INTERVAL: std::time::Duration = std::time::Duration::from_millis(700);
+
+/// Spawns a thread that keeps checking for a known MTK port (BROM, Preloader or
+/// DA) and reports presence changes to the QML thread. It goes through
+/// `PortBackend::Auto`, the same backend selection the connect path uses.
+pub fn start_device_watch(state: &mut AppState) {
+    if WATCH_STARTED.swap(true, Ordering::SeqCst) {
+        return;
+    }
+
+    let invoker = state.get_qml_method_invoker();
+    std::thread::spawn(move || {
+        let mut last: Option<bool> = None;
+
+        loop {
+            let present = matches!(
+                PortType::find_device(None, None, PortBackend::Auto),
+                Ok(Some(_))
+            );
+
+            if last != Some(present) {
+                invoke_method!(invoker, "devicePresenceChanged", present);
+                last = Some(present);
+            }
+
+            std::thread::sleep(WATCH_INTERVAL);
+        }
+    });
 }
 
 fn worker_loop(rx: Receiver<DeviceCommand>) {

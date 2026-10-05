@@ -34,7 +34,10 @@ ApplicationWindow {
     readonly property int pageTemplates: 3
     readonly property int pageSetup: 4
 
-    Component.onCompleted: AppState.refreshSetup()
+    Component.onCompleted: {
+        AppState.startDeviceWatch();
+        AppState.refreshSetup();
+    }
 
     function setPage(page) {
         AppState.page = page;

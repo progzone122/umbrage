@@ -147,7 +147,7 @@ Item {
                 Label {
                     text: "●"
 
-                    color: "#39ff14"
+                    color: (AppState.device_present && AppState.connection_error === "") ? "#39ff14" : Styles.error
                     font.pixelSize: 18
 
                     Layout.alignment: Qt.AlignVCenter
@@ -159,7 +159,7 @@ Item {
                     spacing: 0
 
                     Label {
-                        text: "Connected"
+                        text: (AppState.device_present && AppState.connection_error === "") ? "Connected" : "Disconnected"
 
                         color: Styles.surfaceForeground
                         font.pixelSize: 16
