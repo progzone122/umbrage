@@ -175,21 +175,41 @@ Item {
                     }
                 }
 
-                UButton {
-                    Layout.preferredWidth: 42
-                    Layout.preferredHeight: 48
+                RowLayout {
 
-                    iconDisplay: Button.TextBesideIcon
+                    spacing: Styles.spacing
 
-                    icon.source: "qrc:/assets/disconnect-icon.svg"
-                    icon.color: Styles.surfaceForeground
-                    icon.width: 20
-                    icon.height: 20
+                    UButton {
+                        Layout.preferredWidth: 42
+                        Layout.preferredHeight: 48
 
-                    backgroundColor: Styles.surfaceHigh
+                        iconDisplay: Button.IconOnly
 
-                    onClicked: {
-                        AppState.disconnectDevice();
+                        icon.source: "qrc:/assets/slot-a-icon.svg"
+                        icon.color: Styles.surfaceForeground
+                        icon.width: 20
+                        icon.height: 20
+
+                        text: AppState.active_slot
+                        backgroundColor: Styles.surfaceHigh
+                    }
+
+                    UButton {
+                        Layout.preferredWidth: 42
+                        Layout.preferredHeight: 48
+
+                        iconDisplay: Button.IconOnly
+
+                        icon.source: "qrc:/assets/disconnect-icon.svg"
+                        icon.color: Styles.surfaceForeground
+                        icon.width: 20
+                        icon.height: 20
+
+                        backgroundColor: Styles.surfaceHigh
+
+                        onClicked: {
+                            AppState.disconnectDevice();
+                        }
                     }
                 }
             }
