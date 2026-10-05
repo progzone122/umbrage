@@ -24,6 +24,8 @@ import sys
 import textwrap
 from pathlib import Path
 
+from _app_meta import read_app_version
+
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 TARGET = "x86_64-pc-windows-msvc"
 QT_VERSION = "6.10.3"
@@ -37,7 +39,7 @@ CACHE_DIR = Path.home() / ".cache" / "umbrage-cross"
 DIST_DIR = PROJECT_ROOT / "dist"
 PAYLOAD_DIR = DIST_DIR / "umbrage-windows"
 APP_NAME = "Umbrage"
-APP_VERSION = "0.1.2"
+APP_VERSION = read_app_version()
 
 
 def log(msg: str) -> None:
