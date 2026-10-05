@@ -3,7 +3,7 @@ use std::sync::mpsc::{self, Receiver, Sender};
 
 use qtbridge::{QmlMethodInvoker, QmlObject, invoke_method};
 
-use penumbra_mtk::hacc::{BootPartition, LockState};
+use penumbra_mtk::hacc::LockState;
 use penumbra_mtk::port::{MtkPort, PortBackend, PortType};
 
 use crate::logs;
@@ -650,6 +650,9 @@ pub fn disconnect_device(state: &mut AppState) {
 
     state.connection_error.clear();
     state.connection_error_changed();
+
+    state.active_slot.clear();
+    state.active_slot_changed();
 
     logs::info(&mut state.logs, "Device disconnected");
     state.logs_changed();

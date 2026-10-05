@@ -11,6 +11,8 @@ Item {
     Layout.fillHeight: true
     Layout.preferredWidth: 280
 
+    property string activeSlot: ""
+
     property bool bootloaderExpanded: false
     property bool flashingExpanded: false
     property bool otherExpanded: false

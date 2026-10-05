@@ -42,6 +42,7 @@ pub struct AppState {
     pub(crate) setup_command: String,
     pub(crate) setup_installing: bool,
     pub(crate) templates_cancel: Arc<AtomicBool>,
+    pub(crate) active_slot: String,
 }
 
 #[qobject(Singleton, ConvertToCamelCase)]
@@ -112,6 +113,12 @@ impl AppState {
         "setup_installing",
         Member = setup_installing,
         Notify = setup_installing_changed
+    );
+
+    qproperty!(
+        "active_slot",
+        Member = active_slot,
+        Notify = active_slot_changed
     );
 
     #[qsignal]
@@ -220,7 +227,7 @@ impl AppState {
     pub(crate) fn scatter_file_failed(&mut self, message: String);
 
     #[qsignal]
-    pub(crate) fn active_slot_loaded(&mut self, slot: String);
+    pub(crate) fn active_slot_changed(&mut self);
 
     #[qslot]
     fn request_get_templates(&mut self) {
@@ -376,6 +383,12 @@ impl AppState {
     fn request_get_active_slot(&mut self) {
         callbacks::device::get_active_slot(self);
     }
+
+    #[qslot]
+    pub(crate) fn active_slot_loaded(&mut self, slot: String) {
+        self.active_slot = slot;
+        self.active_slot_changed();
+    }
 }
 
 impl Default for AppState {
@@ -403,6 +416,7 @@ impl Default for AppState {
             setup_command: String::new(),
             setup_installing: false,
             templates_cancel: Arc::new(AtomicBool::new(false)),
+            active_slot: String::new(),
         }
     }
 }
