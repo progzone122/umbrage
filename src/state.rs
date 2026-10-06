@@ -28,6 +28,7 @@ pub struct AppState {
     pub(crate) logs: Vec<String>,
     pub(crate) repo: serde_json::Value,
     pub(crate) connected: bool,
+    pub(crate) device_present: bool,
     pub(crate) connecting: bool,
     pub(crate) chip_name: String,
     pub(crate) chip_platform: String,
@@ -63,6 +64,11 @@ impl AppState {
     qproperty!("logs", Member = logs, Notify = logs_changed);
     qproperty!("repo", Member = repo, Notify = repo_changed);
     qproperty!("connected", Member = connected, Notify = connected_changed);
+    qproperty!(
+        "device_present",
+        Member = device_present,
+        Notify = device_present_changed
+    );
     qproperty!(
         "connecting",
         Member = connecting,
@@ -144,6 +150,9 @@ impl AppState {
 
     #[qsignal]
     pub(crate) fn connected_changed(&mut self);
+
+    #[qsignal]
+    pub(crate) fn device_present_changed(&mut self);
 
     #[qsignal]
     pub(crate) fn connecting_changed(&mut self);
@@ -298,6 +307,33 @@ impl AppState {
     }
 
     #[qslot]
+    fn start_device_watch(&mut self) {
+        callbacks::device::start_device_watch(self);
+    }
+
+    #[qslot]
+    pub(crate) fn device_presence_changed(&mut self, present: bool) {
+        if self.device_present != present {
+            self.device_present = present;
+            self.device_present_changed();
+            self.append_log(format!("Device presence: {present}"));
+        }
+
+        // The watch thread confirms absence after several polls, so this is a
+        // real unplug, not a re-enumeration blip.
+        if !present && self.connected {
+            callbacks::device::on_device_unplugged(self);
+            return;
+        }
+
+        // Re-plugged on the main page with no live session. Reconnect.
+        if present && !self.connected && self.page == Page::Main as u8 {
+            self.append_log("Device re-detected, reconnecting".to_string());
+            callbacks::device::connect_device(self);
+        }
+    }
+
+    #[qslot]
     pub(crate) fn append_log(&mut self, message: String) {
         callbacks::device::append_log(self, message);
     }
@@ -416,6 +452,7 @@ impl Default for AppState {
             logs: Vec::new(),
             repo: serde_json::Value::Null,
             connected: false,
+            device_present: false,
             connecting: false,
             chip_name: String::new(),
             chip_platform: String::new(),
