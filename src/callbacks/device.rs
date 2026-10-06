@@ -68,6 +68,11 @@ pub(crate) fn spawn_device_worker() -> Sender<DeviceCommand> {
 static WATCH_STARTED: AtomicBool = AtomicBool::new(false);
 const WATCH_INTERVAL: std::time::Duration = std::time::Duration::from_millis(700);
 
+/// Consecutive polls that must agree before a presence change is reported.
+/// The device drops off the bus briefly while it re-enumerates from BROM to
+/// DA, and reporting that blip would tear down a live session.
+const PRESENCE_CONFIRM_POLLS: u32 = 3;
+
 /// Spawns a thread that keeps checking for a known MTK port (BROM, Preloader or
 /// DA) and reports presence changes to the QML thread. It goes through
 /// `PortBackend::Auto`, the same backend selection the connect path uses.
@@ -79,6 +84,7 @@ pub fn start_device_watch(state: &mut AppState) {
     let invoker = state.get_qml_method_invoker();
     std::thread::spawn(move || {
         let mut last: Option<bool> = None;
+        let mut streak: u32 = 0;
 
         loop {
             let present = matches!(
@@ -86,9 +92,15 @@ pub fn start_device_watch(state: &mut AppState) {
                 Ok(Some(_))
             );
 
-            if last != Some(present) {
-                invoke_method!(invoker, "devicePresenceChanged", present);
-                last = Some(present);
+            if last == Some(present) {
+                streak = 0;
+            } else {
+                streak += 1;
+                if streak >= PRESENCE_CONFIRM_POLLS {
+                    invoke_method!(invoker, "devicePresenceChanged", present);
+                    last = Some(present);
+                    streak = 0;
+                }
             }
 
             std::thread::sleep(WATCH_INTERVAL);
@@ -706,6 +718,35 @@ pub fn disconnect_device(state: &mut AppState) {
 
     state.page = Page::Steps as u8;
     state.page_changed();
+}
+
+/// Tear down the session after a physical unplug. Keeps the DA/auth/preloader
+/// file paths so a re-plug can reconnect without going through setup again.
+/// Stays on the current page; only the manual Disconnect button navigates.
+pub fn on_device_unplugged(state: &mut AppState) {
+    if let Some(tx) = state.device_tx.lock().unwrap().as_ref() {
+        let _ = tx.send(DeviceCommand::Disconnect);
+    }
+
+    state.connected = false;
+    state.connected_changed();
+    state.connecting = false;
+    state.connecting_changed();
+
+    state.chip_name.clear();
+    state.chip_name_changed();
+    state.chip_platform.clear();
+    state.device_name.clear();
+    state.device_name_changed();
+
+    state.connection_error.clear();
+    state.connection_error_changed();
+
+    state.active_slot.clear();
+    state.active_slot_changed();
+
+    logs::info(&mut state.logs, "Device unplugged");
+    state.logs_changed();
 }
 
 pub fn append_log(state: &mut AppState, message: String) {

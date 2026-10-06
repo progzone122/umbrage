@@ -316,6 +316,20 @@ impl AppState {
         if self.device_present != present {
             self.device_present = present;
             self.device_present_changed();
+            self.append_log(format!("Device presence: {present}"));
+        }
+
+        // The watch thread confirms absence after several polls, so this is a
+        // real unplug, not a re-enumeration blip.
+        if !present && self.connected {
+            callbacks::device::on_device_unplugged(self);
+            return;
+        }
+
+        // Re-plugged on the main page with no live session. Reconnect.
+        if present && !self.connected && self.page == Page::Main as u8 {
+            self.append_log("Device re-detected, reconnecting".to_string());
+            callbacks::device::connect_device(self);
         }
     }
 

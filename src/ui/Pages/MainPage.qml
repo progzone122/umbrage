@@ -67,11 +67,33 @@ Page {
             }
             page.partitions = entries;
         }
-        // If the device goes away, the dialogs must not stay on screen.
-        function onConnectedChanged() {
-            if (!AppState.connected) {
+        // The device was physically unplugged. Close every open dialog and
+        // reset the operation panel to the welcome state so nothing is left
+        // half-open.
+        function onDevicePresentChanged() {
+            if (!AppState.device_present) {
+                confirmDialog.busy = false;
                 confirmDialog.close();
+                operationDialog.busy = false;
+                operationDialog.progress = -1;
+                operationDialog.progressText = "";
                 operationDialog.close();
+                scatterErrorDialog.close();
+                fileDialog.close();
+                scatterFileDialog.close();
+                folderDialog.close();
+
+                page.resetPartitions();
+                exportStack.pop(null);
+                page.currentOperation = "";
+            }
+        }
+        // Reconnected while this page is already visible. Refresh the data that
+        // onVisibleChanged only loads once.
+        function onConnectedChanged() {
+            if (page.visible && AppState.connected) {
+                AppState.requestPartitions();
+                AppState.requestGetActiveSlot();
             }
         }
         // Scatter file parsed. Apply its mapping to the partition table.
