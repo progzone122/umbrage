@@ -198,7 +198,7 @@ Page {
                     type: "device",
                     code: code,
                     title: device.name,
-                    text: device.vendor + " · " + device.model,
+                    text: device.vendor + " · " + device.model + " · " + code,
                     badges: []
                 });
             });
