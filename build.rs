@@ -108,6 +108,12 @@ fn find_rcc() -> PathBuf {
 }
 
 fn main() {
+    if env::var("CARGO_CFG_TARGET_OS").as_deref() == Ok("macos") {
+        for dir in ["/opt/homebrew/opt/qt/lib", "/usr/local/opt/qt/lib"] {
+            println!("cargo:rustc-link-arg=-Wl,-rpath,{dir}");
+        }
+    }
+
     let manifest_dir = PathBuf::from(env::var("CARGO_MANIFEST_DIR").unwrap());
     let qrc = manifest_dir.join("src/ui/resources.qrc");
     let out_dir = PathBuf::from(env::var("OUT_DIR").unwrap());
