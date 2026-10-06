@@ -73,6 +73,7 @@ Item {
                             delegate: MenuButton {
                                 text: modelData.text
                                 onClicked: root.actionRequested(modelData.key)
+                                disabled: !(AppState.device_present && AppState.connection_error === "")
                             }
                         }
                     }
@@ -90,6 +91,7 @@ Item {
                             delegate: MenuButton {
                                 text: modelData.text
                                 onClicked: root.actionRequested(modelData.key)
+                                disabled: !(AppState.device_present && AppState.connection_error === "")
                             }
                         }
                     }
@@ -107,6 +109,7 @@ Item {
                             delegate: MenuButton {
                                 text: modelData.text
                                 onClicked: root.actionRequested(modelData.key)
+                                disabled: !(AppState.device_present && AppState.connection_error === "")
                             }
                         }
                     }
@@ -195,6 +198,7 @@ Item {
                         backgroundColor: Styles.surfaceHigh
 
                         onClicked: root.slotSwitchRequested()
+                        disabled: !(AppState.device_present && AppState.connection_error === "")
                     }
 
                     UButton {
