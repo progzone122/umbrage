@@ -316,7 +316,6 @@ Page {
                     confirmDialog.title = key === "unlock" ? qsTr("Unlock the bootloader?") : qsTr("Lock the bootloader?");
                     confirmDialog.description = key === "unlock" ? qsTr("This will wipe all data on the device and void its warranty.") : qsTr("This will relock the bootloader.");
                     confirmDialog.confirmText = key === "unlock" ? qsTr("Unlock") : qsTr("Lock");
-                    confirmDialog.logText = "Please confirm that you are aware of all the risks and that you really do wish to proceed.";
                     confirmDialog.open();
                 } else {
                     page.resetPartitions();
@@ -336,9 +335,8 @@ Page {
 
                     confirmDialog.actionKey = key;
                     confirmDialog.title = qsTr("Reboot to " + modes[key] + " mode?");
-                    confirmDialog.description = qsTr("The device will be FULLY REBOOTED to " + modes[key] + " mode and may stop responding to commands from Umbrage.");
+                    confirmDialog.description = qsTr("The device will be <b>FULLY REBOOTED</b> to %1 mode and may <b>STOP RESPONDING</b> to commands from Umbrage.").arg(modes[key]);
                     confirmDialog.confirmText = qsTr("Reboot");
-                    confirmDialog.logText = "Please confirm that you are aware of all the risks and that you really do wish to proceed.";
                     confirmDialog.open();
                 }
             }
@@ -348,9 +346,8 @@ Page {
                 confirmDialog.actionKey = "switch_slots";
                 confirmDialog.pendingSlot = target;
                 confirmDialog.title = qsTr("Switch to slot " + target + "?");
-                confirmDialog.description = qsTr("The device will switch the active slot to " + target + "." + "\nBefore switching, make sure that the " + target + " slot contains a working preloader and an lk with the correct signature and version. Otherwise, the device may end up in a HARD BRICK state!");
+                confirmDialog.description = qsTr("The device will switch the active slot to <b>%1</b>." + "<p>Before switching, ensure the <b>%1</b> slot has:<br>" + "ㅤ• A working <b>preloader</b><br>" + "ㅤ• lk contains a <b>valid signature</b> and <b>version</b></p><br>" + "⚠️ Otherwise, the device may end up in a <b>HARD BRICK</b> state!").arg(target);
                 confirmDialog.confirmText = qsTr("Switch");
-                confirmDialog.logText = "Please confirm that you are aware of all the risks and that you really do wish to proceed.";
                 confirmDialog.open();
             }
         }
@@ -477,7 +474,7 @@ Page {
         operationDialog.confirmText = isRead ? qsTr("Read") : qsTr("Write");
         var log = (isRead ? qsTr("Reading ") : qsTr("Writing ")) + operationPanel.checkedCount + qsTr(" partitions…");
         if (isRead && page.outputDirectory !== "")
-            log += "\n" + qsTr("To: ") + page.outputDirectory;
+            log += qsTr("To: %1\n").arg(page.outputDirectory);
         operationDialog.logText = log;
         operationDialog.progress = -1;
         operationDialog.progressText = "";
@@ -502,42 +499,42 @@ Page {
             confirmDialog.busy = true;
 
             if (actionKey === "unlock") {
-                confirmDialog.logText += "\nUnlocking bootloader…";
+                confirmDialog.logText += "Unlocking bootloader…\n";
                 AppState.unlockBootloader();
             }
 
             if (actionKey === "lock") {
-                confirmDialog.logText += "\nLocking bootloader…";
+                confirmDialog.logText += "Locking bootloader…\n";
                 AppState.lockBootloader();
             }
 
             if (actionKey === "reboot_to_normal") {
-                confirmDialog.logText += "\nReboot to normal mode…";
+                confirmDialog.logText += "Reboot to normal mode…\n";
                 AppState.rebootToMode("normal");
             }
 
             if (actionKey === "reboot_to_home_screen") {
-                confirmDialog.logText += "\nReboot to home screen mode…";
+                confirmDialog.logText += "Reboot to home screen mode…\n";
                 AppState.rebootToMode("home_screen");
             }
 
             if (actionKey === "reboot_to_fastboot") {
-                confirmDialog.logText += "\nReboot to fastboot mode…";
+                confirmDialog.logText += "Reboot to fastboot mode…\n";
                 AppState.rebootToMode("fastboot");
             }
 
             if (actionKey === "reboot_to_meta") {
-                confirmDialog.logText += "\nReboot to META mode…";
+                confirmDialog.logText += "Reboot to META mode…\n";
                 AppState.rebootToMode("meta");
             }
 
             if (actionKey === "reboot_to_test") {
-                confirmDialog.logText += "\nReboot to TEST mode…";
+                confirmDialog.logText += "Reboot to TEST mode…\n";
                 AppState.rebootToMode("test");
             }
 
             if (actionKey === "switch_slots") {
-                confirmDialog.logText += "\nSwitching active slot to " + confirmDialog.pendingSlot + "…";
+                confirmDialog.logText += qsTr("Switching active slot to %1…").arg(confirmDialog.pendingSlot);
                 AppState.requestSetActiveSlot(confirmDialog.pendingSlot);
             }
         }
@@ -546,33 +543,33 @@ Page {
         Connections {
             target: AppState
             function onActionProgress(message) {
-                confirmDialog.logText += "\n" + message;
+                confirmDialog.logText += message + "\n";
             }
             function onBootloaderLockFinished(success, message) {
                 confirmDialog.busy = false;
                 if (success) {
                     confirmDialog.confirmEnabled = false;
-                    confirmDialog.logText += "\n" + qsTr("Done. Reboot the device to apply changes.");
+                    confirmDialog.logText += qsTr("Done. Reboot the device to apply changes.\n");
                 } else {
-                    confirmDialog.logText += "\n" + qsTr("Operation failed: ") + message;
+                    confirmDialog.logText += qsTr("Operation failed: %1\n").arg(message);
                 }
             }
             function onRebootToModeFinished(success, message) {
                 confirmDialog.busy = false;
                 if (success) {
                     confirmDialog.confirmEnabled = false;
-                    confirmDialog.logText += "\n" + qsTr("Done. The device is rebooting.");
+                    confirmDialog.logText += qsTr("Done. The device is rebooting.\n");
                 } else {
-                    confirmDialog.logText += "\n" + qsTr("Operation failed: ") + message;
+                    confirmDialog.logText += qsTr("Operation failed: %1\n").arg(message);
                 }
             }
             function onSlotSwitchFinished(success, message) {
                 confirmDialog.busy = false;
                 if (success) {
                     confirmDialog.confirmEnabled = false;
-                    confirmDialog.logText += "\n" + qsTr("Done. The active slot has been switched to " + AppState.active_slot);
+                    confirmDialog.logText += qsTr("Done. The active slot has been switched to %1\n").arg(AppState.active_slot);
                 } else {
-                    confirmDialog.logText += "\n" + qsTr("Operation failed: ") + message;
+                    confirmDialog.logText += qsTr("Operation failed: %1\n").arg(message);
                 }
             }
         }
@@ -588,7 +585,7 @@ Page {
 
         onConfirmed: {
             var isRead = page.currentOperation === "read";
-            operationDialog.logText += "\n" + (isRead ? "Reading " : "Writing ") + operationPanel.checkedCount + " partitions…";
+            operationDialog.logText += (isRead ? "Reading " : "Writing ") + operationPanel.checkedCount + " partitions…\n";
             operationDialog.busy = true;
             operationDialog.progress = 0;
             operationDialog.progressText = "";
@@ -619,16 +616,16 @@ Page {
             function onPartitionProgress(message, percent) {
                 operationDialog.progress = percent / 100;
                 operationDialog.progressText = message;
-                operationDialog.logText += "\n" + message;
+                operationDialog.logText += message + "\n";
             }
             function onPartitionLog(message) {
-                operationDialog.logText += "\n" + message;
+                operationDialog.logText += message + "\n";
             }
             function onPartitionFinished(success, message) {
                 operationDialog.busy = false;
                 operationDialog.progress = success ? 1 : -1;
                 operationDialog.progressText = message;
-                operationDialog.logText += "\n" + message;
+                operationDialog.logText += message + "\n";
             }
         }
     }

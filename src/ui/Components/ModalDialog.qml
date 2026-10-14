@@ -41,6 +41,8 @@ Popup {
 
     default property alias contentArea: contentContainer.data
 
+    property bool confirm: false
+
     anchors.centerIn: parent
 
     modal: true
@@ -71,25 +73,23 @@ Popup {
         anchors.fill: parent
         spacing: Styles.spacing
 
-        Label {
-            Layout.fillWidth: true
-            visible: root.title !== ""
-            horizontalAlignment: Text.AlignHCenter
-            wrapMode: Text.WordWrap
-            color: Styles.textPrimary
-            font.pixelSize: 18
-            font.weight: Font.ExtraBold
-            text: root.title
-        }
+        ColumnLayout {
+            spacing: Styles.spacing
 
-        Label {
-            Layout.fillWidth: true
-            visible: root.description !== ""
-            horizontalAlignment: Text.AlignHCenter
-            wrapMode: Text.WordWrap
-            color: Styles.textPrimary
-            font.pixelSize: 13
-            text: root.description
+            UText {
+                visible: root.title !== ""
+                Layout.fillWidth: true
+                level: "title"
+                text: root.title
+            }
+
+            UText {
+                visible: root.description !== "" && !root.confirm
+                Layout.fillWidth: true
+                level: "small"
+                lineHeight: 1.5
+                text: root.description
+            }
         }
 
         // Determinate progress bar, hidden while `progress` is negative.
@@ -136,7 +136,7 @@ Popup {
             }
         }
 
-        // Caller-provided confirmation area; spinner sits above it.
+        // Caller-provided confirmation area
         ColumnLayout {
             id: contentContainer
 
@@ -144,19 +144,13 @@ Popup {
             spacing: Styles.spacing
 
             Layout.alignment: Qt.AlignHCenter
-
-            BusyIndicator {
-                Layout.alignment: Qt.AlignHCenter
-                visible: root.showSpinner
-                running: root.showSpinner
-            }
         }
 
         // Log panel.
         Rectangle {
             Layout.fillWidth: true
             Layout.preferredHeight: root.logHeight
-            visible: root.showLog
+            visible: root.showLog && root.confirm
 
             color: "black"
             radius: Styles.radiusMedium
@@ -188,6 +182,17 @@ Popup {
             Layout.fillWidth: true
             spacing: Styles.spacing
 
+            ColumnLayout {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+
+                BusyIndicator {
+                    Layout.alignment: Qt.AlignHCenter
+                    visible: root.showSpinner
+                    running: root.showSpinner
+                }
+            }
+
             Item {
                 Layout.fillWidth: true
             }
@@ -209,7 +214,10 @@ Popup {
                 text: root.confirmText
                 disabled: root.busy || !root.confirmEnabled
 
-                onClicked: root.confirmed()
+                onClicked: {
+                    root.confirm = true;
+                    root.confirmed();
+                }
             }
         }
     }
