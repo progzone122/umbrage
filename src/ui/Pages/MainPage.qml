@@ -106,153 +106,6 @@ Page {
         }
     }
 
-    function chooseFileForPartition(index) {
-        page.pendingFileIndex = index;
-        fileDialog.open();
-    }
-
-    function chooseScatterFile() {
-        scatterFileDialog.open();
-    }
-
-    // Parses the picked scatter file and applies its entries to the partition
-    // table. Matching partitions get checked and their file path set so they
-    // can be written.
-    function loadScatterFile(path) {
-        AppState.loadScatterFile(path);
-    }
-
-    function openDirectoryDialog() {
-        folderDialog.open();
-    }
-
-    function setPartitionFile(index, path) {
-        page.partitions = Utils.updateAt(page.partitions, index, function (entry) {
-            entry.file = path;
-        });
-    }
-
-    function togglePartition(index) {
-        page.partitions = Utils.updateAt(page.partitions, index, function (entry) {
-            entry.checked = !entry.checked;
-        });
-    }
-
-    // Appends a blank template version and opens it for editing.
-    function addVersion() {
-        var entry = {
-            name: "",
-            description: "",
-            da: {
-                path: "",
-                name: "",
-                sha256: ""
-            },
-            auth: {
-                path: "",
-                name: "",
-                sha256: ""
-            },
-            preloader: {
-                path: "",
-                name: "",
-                sha256: ""
-            },
-            default: false
-        };
-        page.versions = page.versions.concat([entry]);
-        page.selectedVersion = entry;
-        exportStack.push(exportVersionComponent);
-    }
-
-    // Removes the version at `index` and re-assigns a fresh array so the
-    // version list bindings re-evaluate.
-    function removeVersion(index) {
-        page.versions = page.versions.filter(function (entry, i) {
-            return i !== index;
-        });
-    }
-
-    // Fills the export fields from the template picked in the templates flow.
-    // Looks the device up in AppState.repo and copies its versions into the
-    // { name, description, da, auth, preloader, default } entries the panel
-    // renders. Files carry the repo name + checksum so the export can reuse
-    // them without reading local files, which only exist for the version the
-    // user downloaded.
-    function populateFromSelectedTemplate() {
-        if (AppState.selected_codename === "")
-            return;
-
-        var repo = AppState.repo;
-        var device = repo.devices[AppState.selected_codename];
-        if (device === undefined)
-            return;
-
-        page.codename = AppState.selected_codename;
-        page.vendor = device.vendor;
-        page.model = device.model;
-
-        page.versions = device.versions.map(function (version) {
-            var files = version.files || {};
-            return {
-                name: version.name,
-                description: version.description,
-                da: page.templateFile(files.da),
-                auth: page.templateFile(files.auth),
-                preloader: page.templateFile(files.preloader),
-                default: !!version.default
-            };
-        });
-    }
-
-    // Turns a repo file entry into a slot the chooser/export understand.
-    function templateFile(repoFile) {
-        if (!repoFile)
-            return {
-                path: "",
-                name: "",
-                sha256: ""
-            };
-        return {
-            path: "",
-            name: repoFile.name || "",
-            sha256: repoFile.sha256 || ""
-        };
-    }
-
-    // Applies a parsed scatter file's entries to the partition table. Entries
-    // match by exact name. Downloadable matches get checked and their file path
-    // set.
-    function applyScatterMapping(entries) {
-        var nameToEntry = {};
-        for (var i = 0; i < entries.length; ++i)
-            nameToEntry[entries[i].name] = entries[i];
-
-        page.partitions = page.partitions.map(function (partition) {
-            var copy = JSON.parse(JSON.stringify(partition));
-            var scatter = nameToEntry[partition.name];
-            if (scatter === undefined)
-                return copy;
-            copy.checked = scatter.download;
-            if (scatter.file && scatter.file !== "")
-                copy.file = scatter.file;
-            else
-                delete copy.file;
-            return copy;
-        });
-    }
-
-    // Uncheck everything, clear files, reset the output directory.
-    function resetPartitions() {
-        page.partitions = page.partitions.map(function (entry) {
-            var copy = JSON.parse(JSON.stringify(entry));
-            copy.checked = false;
-            delete copy.file;
-            return copy;
-        });
-        page.outputDirectory = "";
-    }
-
     RowLayout {
         anchors.fill: parent
 
@@ -466,6 +319,153 @@ Page {
                 }
             }
         }
+    }
+
+    function chooseFileForPartition(index) {
+        page.pendingFileIndex = index;
+        fileDialog.open();
+    }
+
+    function chooseScatterFile() {
+        scatterFileDialog.open();
+    }
+
+    // Parses the picked scatter file and applies its entries to the partition
+    // table. Matching partitions get checked and their file path set so they
+    // can be written.
+    function loadScatterFile(path) {
+        AppState.loadScatterFile(path);
+    }
+
+    function openDirectoryDialog() {
+        folderDialog.open();
+    }
+
+    function setPartitionFile(index, path) {
+        page.partitions = Utils.updateAt(page.partitions, index, function (entry) {
+            entry.file = path;
+        });
+    }
+
+    function togglePartition(index) {
+        page.partitions = Utils.updateAt(page.partitions, index, function (entry) {
+            entry.checked = !entry.checked;
+        });
+    }
+
+    // Appends a blank template version and opens it for editing.
+    function addVersion() {
+        var entry = {
+            name: "",
+            description: "",
+            da: {
+                path: "",
+                name: "",
+                sha256: ""
+            },
+            auth: {
+                path: "",
+                name: "",
+                sha256: ""
+            },
+            preloader: {
+                path: "",
+                name: "",
+                sha256: ""
+            },
+            default: false
+        };
+        page.versions = page.versions.concat([entry]);
+        page.selectedVersion = entry;
+        exportStack.push(exportVersionComponent);
+    }
+
+    // Removes the version at `index` and re-assigns a fresh array so the
+    // version list bindings re-evaluate.
+    function removeVersion(index) {
+        page.versions = page.versions.filter(function (entry, i) {
+            return i !== index;
+        });
+    }
+
+    // Fills the export fields from the template picked in the templates flow.
+    // Looks the device up in AppState.repo and copies its versions into the
+    // { name, description, da, auth, preloader, default } entries the panel
+    // renders. Files carry the repo name + checksum so the export can reuse
+    // them without reading local files, which only exist for the version the
+    // user downloaded.
+    function populateFromSelectedTemplate() {
+        if (AppState.selected_codename === "")
+            return;
+
+        var repo = AppState.repo;
+        var device = repo.devices[AppState.selected_codename];
+        if (device === undefined)
+            return;
+
+        page.codename = AppState.selected_codename;
+        page.vendor = device.vendor;
+        page.model = device.model;
+
+        page.versions = device.versions.map(function (version) {
+            var files = version.files || {};
+            return {
+                name: version.name,
+                description: version.description,
+                da: page.templateFile(files.da),
+                auth: page.templateFile(files.auth),
+                preloader: page.templateFile(files.preloader),
+                default: !!version.default
+            };
+        });
+    }
+
+    // Turns a repo file entry into a slot the chooser/export understand.
+    function templateFile(repoFile) {
+        if (!repoFile)
+            return {
+                path: "",
+                name: "",
+                sha256: ""
+            };
+        return {
+            path: "",
+            name: repoFile.name || "",
+            sha256: repoFile.sha256 || ""
+        };
+    }
+
+    // Applies a parsed scatter file's entries to the partition table. Entries
+    // match by exact name. Downloadable matches get checked and their file path
+    // set.
+    function applyScatterMapping(entries) {
+        var nameToEntry = {};
+        for (var i = 0; i < entries.length; ++i)
+            nameToEntry[entries[i].name] = entries[i];
+
+        page.partitions = page.partitions.map(function (partition) {
+            var copy = JSON.parse(JSON.stringify(partition));
+            var scatter = nameToEntry[partition.name];
+            if (scatter === undefined)
+                return copy;
+            copy.checked = scatter.download;
+            if (scatter.file && scatter.file !== "")
+                copy.file = scatter.file;
+            else
+                delete copy.file;
+            return copy;
+        });
+    }
+
+    // Uncheck everything, clear files, reset the output directory.
+    function resetPartitions() {
+        page.partitions = page.partitions.map(function (entry) {
+            var copy = JSON.parse(JSON.stringify(entry));
+            copy.checked = false;
+            delete copy.file;
+            return copy;
+        });
+        page.outputDirectory = "";
     }
 
     function openOperationDialog() {

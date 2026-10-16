@@ -24,38 +24,6 @@ Page {
     signal finishedRequested
     signal backRequested
 
-    function goNext() {
-        if (page.isLastStep) {
-            page.finishedRequested();
-        } else {
-            page.nextRequested(page.step + 1);
-        }
-    }
-
-    function setCurrentFile(path) {
-        switch (page.step) {
-        case 1:
-            AppState.da_file = path;
-            break;
-        case 2:
-            AppState.auth_file = path;
-            break;
-        case 3:
-            AppState.preloader_file = path;
-            break;
-        }
-    }
-
-    function chooseFile() {
-        fileDialog.step = page.step;
-        fileDialog.open();
-    }
-
-    function skip() {
-        page.setCurrentFile("");
-        page.goNext();
-    }
-
     RowLayout {
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.verticalCenter: parent.verticalCenter
@@ -115,5 +83,37 @@ Page {
             console.log("File selected: " + fileDialog.file.toString());
             page.goNext();
         }
+    }
+
+    function goNext() {
+        if (page.isLastStep) {
+            page.finishedRequested();
+        } else {
+            page.nextRequested(page.step + 1);
+        }
+    }
+
+    function setCurrentFile(path) {
+        switch (page.step) {
+        case 1:
+            AppState.da_file = path;
+            break;
+        case 2:
+            AppState.auth_file = path;
+            break;
+        case 3:
+            AppState.preloader_file = path;
+            break;
+        }
+    }
+
+    function chooseFile() {
+        fileDialog.step = page.step;
+        fileDialog.open();
+    }
+
+    function skip() {
+        page.setCurrentFile("");
+        page.goNext();
     }
 }

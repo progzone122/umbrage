@@ -39,16 +39,6 @@ ApplicationWindow {
         AppState.refreshSetup();
     }
 
-    function setPage(page) {
-        AppState.page = page;
-    }
-
-    // Re-check prerequisites and route through the setup page if needed.
-    function continueToDevice() {
-        AppState.refreshSetup();
-        root.setPage(AppState.need_setup ? root.pageSetup : root.pageWaitConn);
-    }
-
     ColumnLayout {
         anchors.fill: parent
 
@@ -103,5 +93,15 @@ ApplicationWindow {
             onFinished: root.continueToDevice()
             onGoTemplates: root.setPage(root.pageTemplates)
         }
+    }
+
+    function setPage(page) {
+        AppState.page = page;
+    }
+
+    // Re-check prerequisites and route through the setup page if needed.
+    function continueToDevice() {
+        AppState.refreshSetup();
+        root.setPage(AppState.need_setup ? root.pageSetup : root.pageWaitConn);
     }
 }
