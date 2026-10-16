@@ -22,37 +22,6 @@ Page {
         }
     }
 
-    // Short, actionable hint for common connection errors; empty when no
-    // specific hint applies.
-    function errorHint() {
-        var error = AppState.connection_error;
-        if (error === "") {
-            return "";
-        }
-
-        // DAA / auth-file errors (BROM security handshake).
-        if (error.includes("DAA") || error.includes("signature verification") || error.includes("auth file") || error.includes("ToolAuthIsNull") || error.includes("SecAuthFile")) {
-            return qsTr("This usually means the selected auth file does not match the device, or is missing. Try again with the correct auth file for this device.");
-        }
-
-        // DA-file errors raised while uploading the download agent.
-        if (error.includes("No compatible DA") || error.includes("DA file") || error.includes("MTK_DOWNLOAD_AGENT") || error.includes("DA protocol")) {
-            return qsTr("The download agent (DA) file does not match this device, or is corrupted. Select the correct DA file for this chip model and try again.");
-        }
-
-        // Preloader errors raised when connecting in BROM mode.
-        if (error.includes("preloader")) {
-            return qsTr("A matching preloader is required for this device in BROM mode. Select the correct preloader file and try again.");
-        }
-
-        // Timeouts and USB/transport errors.
-        if (error.includes("Timeout") || error.includes("I/O Error") || error.includes("Connection Error") || error.includes("not connected")) {
-            return qsTr("The connection to the device timed out or was lost. Reconnect the device, make sure it is in Preloader or BROM mode, and try again.");
-        }
-
-        return "";
-    }
-
     ColumnLayout {
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.verticalCenter: parent.verticalCenter
@@ -141,5 +110,36 @@ Page {
                 onClicked: AppState.disconnectDevice()
             }
         }
+    }
+
+    // Short, actionable hint for common connection errors; empty when no
+    // specific hint applies.
+    function errorHint() {
+        var error = AppState.connection_error;
+        if (error === "") {
+            return "";
+        }
+
+        // DAA / auth-file errors (BROM security handshake).
+        if (error.includes("DAA") || error.includes("signature verification") || error.includes("auth file") || error.includes("ToolAuthIsNull") || error.includes("SecAuthFile")) {
+            return qsTr("This usually means the selected auth file does not match the device, or is missing. Try again with the correct auth file for this device.");
+        }
+
+        // DA-file errors raised while uploading the download agent.
+        if (error.includes("No compatible DA") || error.includes("DA file") || error.includes("MTK_DOWNLOAD_AGENT") || error.includes("DA protocol")) {
+            return qsTr("The download agent (DA) file does not match this device, or is corrupted. Select the correct DA file for this chip model and try again.");
+        }
+
+        // Preloader errors raised when connecting in BROM mode.
+        if (error.includes("preloader")) {
+            return qsTr("A matching preloader is required for this device in BROM mode. Select the correct preloader file and try again.");
+        }
+
+        // Timeouts and USB/transport errors.
+        if (error.includes("Timeout") || error.includes("I/O Error") || error.includes("Connection Error") || error.includes("not connected")) {
+            return qsTr("The connection to the device timed out or was lost. Reconnect the device, make sure it is in Preloader or BROM mode, and try again.");
+        }
+
+        return "";
     }
 }

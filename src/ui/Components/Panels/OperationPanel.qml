@@ -47,23 +47,6 @@ Item {
 
     property bool warningHardBrickAcknowledged: false
 
-    // Cleared only when a risky partition gets checked, so re-toggling safe
-    // ones never re-shows the warning after a confirmation.
-    function onToggle(index) {
-        var risky = ["preloader_a", "preloader_b", "preloader", "SGPT", "PGPT"];
-        var entry = root.partitions[index];
-        if (!entry)
-            return;
-
-        // Only act on a risky partition that's currently unchecked.
-        if (risky.indexOf(entry.name) === -1)
-            return;
-        if (entry.checked)
-            return;
-
-        root.warningHardBrickAcknowledged = false;
-    }
-
     Rectangle {
         anchors.fill: parent
         anchors.margins: Styles.spacing / 2
@@ -206,5 +189,22 @@ Item {
                 Layout.fillHeight: true
             }
         }
+    }
+
+    // Cleared only when a risky partition gets checked, so re-toggling safe
+    // ones never re-shows the warning after a confirmation.
+    function onToggle(index) {
+        var risky = ["preloader_a", "preloader_b", "preloader", "SGPT", "PGPT"];
+        var entry = root.partitions[index];
+        if (!entry)
+            return;
+
+        // Only act on a risky partition that's currently unchecked.
+        if (risky.indexOf(entry.name) === -1)
+            return;
+        if (entry.checked)
+            return;
+
+        root.warningHardBrickAcknowledged = false;
     }
 }

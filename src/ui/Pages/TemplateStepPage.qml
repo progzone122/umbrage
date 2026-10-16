@@ -28,27 +28,6 @@ Page {
     property string searchQuery: ""
     property bool searching: false
 
-    function matchesSearch(item) {
-        if (page.searchQuery === "")
-            return true;
-
-        var query = page.searchQuery.toLowerCase();
-
-        if (item.title && item.title.toLowerCase().indexOf(query) !== -1)
-            return true;
-        if (item.text && item.text.toLowerCase().indexOf(query) !== -1)
-            return true;
-
-        if (item.badges) {
-            for (var i = 0; i < item.badges.length; i++) {
-                if (item.badges[i].text && item.badges[i].text.toLowerCase().indexOf(query) !== -1)
-                    return true;
-            }
-        }
-
-        return false;
-    }
-
     ColumnLayout {
         anchors.centerIn: parent
         width: Math.min(parent.width - page.contentMargin * 2, page.maxContentWidth)
@@ -174,5 +153,26 @@ Page {
                 onClicked: page.backRequested(page.step)
             }
         }
+    }
+
+    function matchesSearch(item) {
+        if (page.searchQuery === "")
+            return true;
+
+        var query = page.searchQuery.toLowerCase();
+
+        if (item.title && item.title.toLowerCase().indexOf(query) !== -1)
+            return true;
+        if (item.text && item.text.toLowerCase().indexOf(query) !== -1)
+            return true;
+
+        if (item.badges) {
+            for (var i = 0; i < item.badges.length; i++) {
+                if (item.badges[i].text && item.badges[i].text.toLowerCase().indexOf(query) !== -1)
+                    return true;
+            }
+        }
+
+        return false;
     }
 }

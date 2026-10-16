@@ -30,62 +30,6 @@ Item {
     Layout.fillWidth: true
     Layout.fillHeight: true
 
-    // The save dialog suggests this file name, built from the codename.
-    function exportFileName() {
-        var name = root.codename.trim();
-        if (name === "")
-            name = "template";
-        return name + ".meta.yml";
-    }
-
-    function openExportDialog() {
-        var dir = StandardPaths.writableLocation(StandardPaths.DocumentsLocation);
-        if (dir === "")
-            dir = StandardPaths.writableLocation(StandardPaths.HomeLocation);
-        exportDialog.folder = dir;
-        exportDialog.currentFile = dir + "/" + root.exportFileName();
-        exportDialog.open();
-    }
-
-    // Shapes the panel data into the payload Rust expects for export.
-    function buildExportPayload() {
-        var list = [];
-        for (var i = 0; i < root.versions.length; i++) {
-            var v = root.versions[i];
-            list.push({
-                name: v.name ? v.name : "",
-                description: v.description ? v.description : "",
-                default: v.default === true,
-                files: {
-                    da: root.filePayload(v.da),
-                    auth: root.filePayload(v.auth),
-                    preloader: root.filePayload(v.preloader)
-                }
-            });
-        }
-        return {
-            vendor: root.vendor ? root.vendor : "",
-            model: root.model ? root.model : "",
-            codename: root.codename ? root.codename : "",
-            versions: list
-        };
-    }
-
-    // A local path is sent as-is; a repo entry is sent as { name, sha256 } so
-    // Rust reuses the checksum without reading the file.
-    function filePayload(entry) {
-        if (!entry)
-            return "";
-        if (entry.path)
-            return entry.path;
-        if (entry.sha256)
-            return {
-                name: entry.name,
-                sha256: entry.sha256
-            };
-        return "";
-    }
-
     Rectangle {
         anchors.fill: parent
         anchors.margins: Styles.spacing / 2
@@ -242,5 +186,61 @@ Item {
         confirmText: qsTr("Close")
 
         onConfirmed: exportResultDialog.close()
+    }
+
+    // The save dialog suggests this file name, built from the codename.
+    function exportFileName() {
+        var name = root.codename.trim();
+        if (name === "")
+            name = "template";
+        return name + ".meta.yml";
+    }
+
+    function openExportDialog() {
+        var dir = StandardPaths.writableLocation(StandardPaths.DocumentsLocation);
+        if (dir === "")
+            dir = StandardPaths.writableLocation(StandardPaths.HomeLocation);
+        exportDialog.folder = dir;
+        exportDialog.currentFile = dir + "/" + root.exportFileName();
+        exportDialog.open();
+    }
+
+    // Shapes the panel data into the payload Rust expects for export.
+    function buildExportPayload() {
+        var list = [];
+        for (var i = 0; i < root.versions.length; i++) {
+            var v = root.versions[i];
+            list.push({
+                name: v.name ? v.name : "",
+                description: v.description ? v.description : "",
+                default: v.default === true,
+                files: {
+                    da: root.filePayload(v.da),
+                    auth: root.filePayload(v.auth),
+                    preloader: root.filePayload(v.preloader)
+                }
+            });
+        }
+        return {
+            vendor: root.vendor ? root.vendor : "",
+            model: root.model ? root.model : "",
+            codename: root.codename ? root.codename : "",
+            versions: list
+        };
+    }
+
+    // A local path is sent as-is; a repo entry is sent as { name, sha256 } so
+    // Rust reuses the checksum without reading the file.
+    function filePayload(entry) {
+        if (!entry)
+            return "";
+        if (entry.path)
+            return entry.path;
+        if (entry.sha256)
+            return {
+                name: entry.name,
+                sha256: entry.sha256
+            };
+        return "";
     }
 }

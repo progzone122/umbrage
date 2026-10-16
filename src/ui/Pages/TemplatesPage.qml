@@ -49,64 +49,6 @@ Page {
     onErrorTitleChanged: page.syncDialogs()
     onErrorMessageChanged: page.syncDialogs()
 
-    function reset() {
-        page.loading = true;
-        page.filesPending = false;
-        page.errorTitle = "";
-        page.errorMessage = "";
-        page.repoLoaded = false;
-        page.selectedVendor = "";
-        page.selectedDevice = "";
-        page.startTime = Date.now();
-        AppState.device_name = "";
-        AppState.selected_codename = "";
-        page.syncDialogs();
-        AppState.requestGetTemplates();
-    }
-
-    // Stop any in-flight fetch/download and leave the templates flow.
-    function abort() {
-        AppState.cancelTemplatesLoading();
-        page.loading = false;
-        page.filesPending = false;
-        page.errorTitle = "";
-        page.errorMessage = "";
-        page.cancelled();
-    }
-
-    // Keeps the dialogs in sync with the page state.
-    function syncDialogs() {
-        if (page.visible && page.loading)
-            loadingDialog.open();
-        else
-            loadingDialog.close();
-
-        if (page.visible && page.filesPending)
-            downloadDialog.open();
-        else
-            downloadDialog.close();
-
-        if (page.visible && page.errorTitle !== "")
-            errorDialog.open();
-        else
-            errorDialog.close();
-    }
-
-    function onRepoReady() {
-        if (page.loading === false)
-            return;
-        page.repo = AppState.repo;
-        page.repoLoaded = true;
-        finishLoading();
-    }
-
-    function finishLoading() {
-        var elapsed = Date.now() - startTime;
-        var remaining = Math.max(0, 2000 - elapsed);
-        loadingTimer.interval = remaining;
-        loadingTimer.start();
-    }
-
     Timer {
         id: loadingTimer
         running: false
@@ -141,108 +83,6 @@ Page {
             text: "Choose the template version"
         }
     ]
-
-    // File names can be long; badges show at most 20 characters.
-    function shortFileName(name) {
-        return Utils.elideRight(name, 20);
-    }
-
-    function fileBadges(files) {
-        var badges = [];
-        var order = ["da", "auth", "preloader"];
-        for (var i = 0; i < order.length; i++) {
-            var key = order[i];
-            if (files && files[key]) {
-                badges.push({
-                    iconPath: Utils.iconFor(key),
-                    text: page.shortFileName(files[key].name)
-                });
-            }
-        }
-        return badges;
-    }
-
-    function versionBadges(version) {
-        var badges = [];
-        if (version.default) {
-            badges.push({
-                iconPath: "qrc:/assets/ok-icon.svg",
-                text: "Recommended by default"
-            });
-        }
-        var files = page.fileBadges(version.files);
-        for (var i = 0; i < files.length; i++) {
-            badges.push(files[i]);
-        }
-        return badges;
-    }
-
-    function buildStepItems(step) {
-        var items = [];
-
-        switch (step) {
-        case 0:
-            Object.keys(page.repo.vendors).forEach(function (vendor) {
-                items.push({
-                    type: "vendor",
-                    title: vendor,
-                    text: "",
-                    badges: []
-                });
-            });
-            break;
-        case 1:
-            page.repo.vendors[page.selectedVendor].forEach(function (code) {
-                var device = page.repo.devices[code];
-                items.push({
-                    type: "device",
-                    code: code,
-                    title: device.name,
-                    text: device.vendor + " · " + device.model + " · " + code,
-                    badges: []
-                });
-            });
-            break;
-        case 2:
-            page.repo.devices[page.selectedDevice].versions.forEach(function (version) {
-                items.push({
-                    type: "template",
-                    title: version.name,
-                    text: version.description,
-                    badges: page.versionBadges(version),
-                    files: version.files
-                });
-            });
-            break;
-        }
-
-        return items;
-    }
-
-    function applyFiles(files) {
-        if (!files)
-            return;
-        // Hand the selected template's files (paths + checksums) to Rust,
-        // which downloads them and fills da/auth/preloader with local paths.
-        page.filesPending = true;
-        page.downloadProgress = -1;
-        page.downloadText = "";
-        AppState.downloadTemplateFiles(files);
-    }
-
-    function onItemSelected(item, step) {
-        if (step === 0) {
-            page.selectedVendor = item.title;
-            stepStack.pushStep(1);
-        } else if (step === 1) {
-            page.selectedDevice = item.code;
-            AppState.device_name = item.title;
-            AppState.selected_codename = item.code;
-            stepStack.pushStep(2);
-        } else {
-            page.applyFiles(item.files);
-        }
-    }
 
     Connections {
         target: AppState
@@ -368,5 +208,165 @@ Page {
     Component {
         id: templateStepComponent
         TemplateStepPage {}
+    }
+
+    function reset() {
+        page.loading = true;
+        page.filesPending = false;
+        page.errorTitle = "";
+        page.errorMessage = "";
+        page.repoLoaded = false;
+        page.selectedVendor = "";
+        page.selectedDevice = "";
+        page.startTime = Date.now();
+        AppState.device_name = "";
+        AppState.selected_codename = "";
+        page.syncDialogs();
+        AppState.requestGetTemplates();
+    }
+
+    // Stop any in-flight fetch/download and leave the templates flow.
+    function abort() {
+        AppState.cancelTemplatesLoading();
+        page.loading = false;
+        page.filesPending = false;
+        page.errorTitle = "";
+        page.errorMessage = "";
+        page.cancelled();
+    }
+
+    // Keeps the dialogs in sync with the page state.
+    function syncDialogs() {
+        if (page.visible && page.loading)
+            loadingDialog.open();
+        else
+            loadingDialog.close();
+
+        if (page.visible && page.filesPending)
+            downloadDialog.open();
+        else
+            downloadDialog.close();
+
+        if (page.visible && page.errorTitle !== "")
+            errorDialog.open();
+        else
+            errorDialog.close();
+    }
+
+    function onRepoReady() {
+        if (page.loading === false)
+            return;
+        page.repo = AppState.repo;
+        page.repoLoaded = true;
+        finishLoading();
+    }
+
+    function finishLoading() {
+        var elapsed = Date.now() - startTime;
+        var remaining = Math.max(0, 2000 - elapsed);
+        loadingTimer.interval = remaining;
+        loadingTimer.start();
+    }
+
+    // File names can be long; badges show at most 20 characters.
+    function shortFileName(name) {
+        return Utils.elideRight(name, 20);
+    }
+
+    function fileBadges(files) {
+        var badges = [];
+        var order = ["da", "auth", "preloader"];
+        for (var i = 0; i < order.length; i++) {
+            var key = order[i];
+            if (files && files[key]) {
+                badges.push({
+                    iconPath: Utils.iconFor(key),
+                    text: page.shortFileName(files[key].name)
+                });
+            }
+        }
+        return badges;
+    }
+
+    function versionBadges(version) {
+        var badges = [];
+        if (version.default) {
+            badges.push({
+                iconPath: "qrc:/assets/ok-icon.svg",
+                text: "Recommended by default"
+            });
+        }
+        var files = page.fileBadges(version.files);
+        for (var i = 0; i < files.length; i++) {
+            badges.push(files[i]);
+        }
+        return badges;
+    }
+
+    function buildStepItems(step) {
+        var items = [];
+
+        switch (step) {
+        case 0:
+            Object.keys(page.repo.vendors).forEach(function (vendor) {
+                items.push({
+                    type: "vendor",
+                    title: vendor,
+                    text: "",
+                    badges: []
+                });
+            });
+            break;
+        case 1:
+            page.repo.vendors[page.selectedVendor].forEach(function (code) {
+                var device = page.repo.devices[code];
+                items.push({
+                    type: "device",
+                    code: code,
+                    title: device.name,
+                    text: device.vendor + " · " + device.model + " · " + code,
+                    badges: []
+                });
+            });
+            break;
+        case 2:
+            page.repo.devices[page.selectedDevice].versions.forEach(function (version) {
+                items.push({
+                    type: "template",
+                    title: version.name,
+                    text: version.description,
+                    badges: page.versionBadges(version),
+                    files: version.files
+                });
+            });
+            break;
+        }
+
+        return items;
+    }
+
+    function applyFiles(files) {
+        if (!files)
+            return;
+        // Hand the selected template's files (paths + checksums) to Rust,
+        // which downloads them and fills da/auth/preloader with local paths.
+        page.filesPending = true;
+        page.downloadProgress = -1;
+        page.downloadText = "";
+        AppState.downloadTemplateFiles(files);
+    }
+
+    function onItemSelected(item, step) {
+        if (step === 0) {
+            page.selectedVendor = item.title;
+            stepStack.pushStep(1);
+        } else if (step === 1) {
+            page.selectedDevice = item.code;
+            AppState.device_name = item.title;
+            AppState.selected_codename = item.code;
+            stepStack.pushStep(2);
+        } else {
+            page.applyFiles(item.files);
+        }
     }
 }
