@@ -73,7 +73,7 @@ Item {
                             delegate: MenuButton {
                                 text: modelData.text
                                 onClicked: root.actionRequested(modelData.key)
-                                disabled: !(AppState.device_present && AppState.connection_error === "")
+                                // disabled: !(AppState.device_present && AppState.connection_error === "")
                             }
                         }
                     }
@@ -91,7 +91,7 @@ Item {
                             delegate: MenuButton {
                                 text: modelData.text
                                 onClicked: root.actionRequested(modelData.key)
-                                disabled: !(AppState.device_present && AppState.connection_error === "")
+                                // disabled: !(AppState.device_present && AppState.connection_error === "")
                             }
                         }
                     }
@@ -109,7 +109,7 @@ Item {
                             delegate: MenuButton {
                                 text: modelData.text
                                 onClicked: root.actionRequested(modelData.key)
-                                disabled: !(AppState.device_present && AppState.connection_error === "")
+                                // disabled: !(AppState.device_present && AppState.connection_error === "")
                             }
                         }
                     }
@@ -189,7 +189,7 @@ Item {
                         Layout.preferredHeight: 48
                         iconDisplay: Button.IconOnly
 
-                        visible: AppState.active_slot !== ""
+                        // visible: AppState.active_slot !== ""
                         icon.source: AppState.active_slot === "A" ? "qrc:/assets/slot-a-icon.svg" : "qrc:/assets/slot-b-icon.svg"
                         icon.color: Styles.surfaceForeground
                         icon.width: 20
@@ -198,7 +198,7 @@ Item {
                         backgroundColor: Styles.surfaceHigh
 
                         onClicked: root.slotSwitchRequested()
-                        disabled: !(AppState.device_present && AppState.connection_error === "")
+                        // disabled: !(AppState.device_present && AppState.connection_error === "")
                     }
 
                     UButton {

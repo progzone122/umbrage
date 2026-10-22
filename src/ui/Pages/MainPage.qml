@@ -132,6 +132,11 @@ Page {
                     text: "Write partitions"
                 },
                 {
+                    key: "advanced_flashing_operations",
+                    section: "flashing",
+                    text: "Advanced Read/Write"
+                },
+                {
                     key: "reboot_to_normal",
                     section: "reboot",
                     text: "Normal mode"
@@ -270,6 +275,38 @@ Page {
                     page.togglePartition(index);
                 }
                 onActionRequested: page.openOperationDialog()
+            }
+
+            StackView {
+                id: advancedOperationsStack
+
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                visible: page.currentOperation == "advanced_flashing_operations"
+                clip: true
+
+                initialItem: advancedOperationsComponent
+
+                Component {
+                    id: advancedOperationsComponent
+
+                    AdvancedOperationsPanel {
+                        versions: page.versions
+                        codename: page.codename
+                        vendor: page.vendor
+                        model: page.model
+
+                        onBackRequested: page.currentOperation = ""
+                        // onAddVersionRequested: page.addVersion()
+                        onRemoveVersionRequested: function (index) {
+                        // page.removeVersion(index);
+                        }
+                        onVersionSelected: function (index) {
+                        // page.selectedVersion = page.versions[index];
+                        // exportStack.push(exportVersionComponent);
+                        }
+                    }
+                }
             }
 
             StackView {
