@@ -122,13 +122,9 @@ pub fn download_template_files(state: &mut AppState, files: serde_json::Value) {
             last_pct.set(pct);
 
             let text = if total == 0 {
-                format!("{name}: {}", format_size(done as usize))
+                format!("{name}: {}", format_size(done))
             } else {
-                format!(
-                    "{name}: {} / {}",
-                    format_size(done as usize),
-                    format_size(total as usize)
-                )
+                format!("{name}: {} / {}", format_size(done), format_size(total))
             };
             invoke_method!(
                 progress_invoker,
