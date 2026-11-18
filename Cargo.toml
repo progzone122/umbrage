@@ -17,8 +17,7 @@ sha2 = "0.11.0"
 tokio = { version = "1.53.1", features = ["full"] }
 env_logger = "0.11.8"
 log = "0.4"
-penumbra-mtk = { git = "https://github.com/umbrage-org/umbrage-penumbra", package = "penumbra-mtk", rev = "55fb158", default-features = false, features = ["libusb", "exploits"] }
-rusb = { version = "0.9", features = ["vendored"] }
+penumbra-mtk = { git = "https://github.com/umbrage-org/umbrage-penumbra", package = "penumbra-mtk", rev = "56b116b", default-features = false, features = ["nusb", "exploits"] }
 
 [build-dependencies]
 cxx-build = "1.0"
