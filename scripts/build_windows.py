@@ -255,6 +255,19 @@ def cargo_build(
     if clean:
         log("cargo clean (windows target)")
         run(["cargo", "clean", "--target", TARGET], cwd=PROJECT_ROOT)
+    else:
+        run(
+            [
+                "cargo",
+                "clean",
+                "--release",
+                "--target",
+                TARGET,
+                "-p",
+                "qtbridge-runtime",
+            ],
+            cwd=PROJECT_ROOT,
+        )
 
     log(f"Building {TARGET} (release)")
     run(

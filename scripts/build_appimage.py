@@ -137,6 +137,15 @@ def cargo_build(clean: bool) -> Path:
     if clean:
         log("cargo clean (release)")
         run(["cargo", "clean", "--release"], cwd=PROJECT_ROOT)
+    else:
+        # qtbridge-runtime compiles C++ against private Qt headers
+        # (QMetaObjectBuilder) whose ABI/API changed in Qt 6.12, but its
+        # build.rs does not track the Qt version. Always recompile the C++
+        # bridge so it matches the active Qt installation.
+        run(
+            ["cargo", "clean", "--release", "-p", "qtbridge-runtime"],
+            cwd=PROJECT_ROOT,
+        )
 
     log("Building release binary")
     run(["cargo", "build", "--release"], cwd=PROJECT_ROOT)
@@ -352,6 +361,10 @@ def deploy_deps(tools: Path) -> None:
 APPRUN_TEMPLATE = """\
 #!/bin/sh
 HERE="${APPDIR:-$(dirname "$(readlink -f "$0")")}"
+export LD_LIBRARY_PATH="$HERE/usr/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+export QT_PLUGIN_PATH="$HERE/usr/plugins"
+export QML2_IMPORT_PATH="$HERE/usr/qml"
+export QML_IMPORT_PATH="$HERE/usr/qml"
 if [ -z "${QT_QPA_PLATFORMTHEME:-}" ]; then
     # Route file dialogs through the XDG desktop portal
     export QT_QPA_PLATFORMTHEME=xdgdesktopportal
