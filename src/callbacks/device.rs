@@ -409,8 +409,8 @@ fn report_progress(
     index: usize,
     count: usize,
     pct_cell: &AtomicI64,
-    done: usize,
-    total: usize,
+    done: u64,
+    total: u64,
 ) {
     let fraction = if total == 0 {
         1.0
@@ -516,7 +516,7 @@ fn run_partitions_on_worker(
             };
 
             let size = match file.metadata() {
-                Ok(m) => m.len() as usize,
+                Ok(m) => m.len() as u64,
                 Err(e) => {
                     log(format!("ERROR: Failed to stat {src_path}: {e}"));
                     failures += 1;
@@ -561,7 +561,7 @@ fn run_partitions_on_worker(
 }
 
 // Formats a byte count as a compact string (e.g. `3.5GB`).
-pub(crate) fn format_size(bytes: usize) -> String {
+pub(crate) fn format_size(bytes: u64) -> String {
     const UNITS: [&str; 5] = ["B", "KB", "MB", "GB", "TB"];
 
     let mut value = bytes as f64;
@@ -1004,7 +1004,7 @@ fn set_active_slot_on_worker(
     let mut data = vec![0u8; OFFSET_SLOT_SUFFIX + bytes.len()];
     data[OFFSET_SLOT_SUFFIX..].copy_from_slice(bytes);
 
-    if let Err(e) = dev.write_partition("misc", data.len(), &data[..], |_, _| {}) {
+    if let Err(e) = dev.write_partition("misc", data.len() as u64, &data[..], |_, _| {}) {
         let msg = format!("Failed to write the boot control to 'misc': {e}.");
         log(format!("[Switch slot] ERROR: {msg}"));
         invoke_method!(invoker, "slotSwitchFinished", false, msg);
