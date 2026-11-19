@@ -79,10 +79,10 @@ Download the [latest release](https://github.com/progzone122/umbrage/releases), 
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" && brew install qt
 ```
 
-2. Download the [latest release](https://github.com/progzone122/umbrage/releases), run Umbrage in the terminal **with elevated privileges** and simply follow the on-screen instructions!
+2. Download the [latest release](https://github.com/progzone122/umbrage/releases), run Umbrage in the terminal and simply follow the on-screen instructions!
 
 ```shell
-sudo ./umbrage-macos-arm
+./umbrage-macos-arm
 ```
 
 ### Microslop Windows
@@ -97,7 +97,7 @@ Umbrage currently does not provide ready-made Windows binaries, **because making
 
 If you've still decided to suffer - [compile](CONTRIBUTING.md) `umbrage-setup.exe` from source and run it to install Umbrage.
 
-`libusb` is already bundled into the binary, **but a suitable driver for the MediaTek USB interface is not installed automatically.**
+**A suitable driver for the MediaTek USB interface is not installed automatically.**
 
 Install **WinUSB** once via [Zadig](https://zadig.akeo.ie/):
 
@@ -110,7 +110,7 @@ Install **WinUSB** once via [Zadig](https://zadig.akeo.ie/):
 
 The device may remain in BROM/Preloader mode for only a limited time, after which it simply disappears from the system. So you need to select the right USB interface in Zadig and install the driver while the device is still detected.
 
-After that, Umbrage will be able to access the device via `libusb` **(Probably, depending on the Indians' mood)**.
+After that, Umbrage will be able to access the device **(Probably, depending on the Indians' mood)**.
 
 _Quite simple, isn't it?_
 
